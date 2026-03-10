@@ -1,0 +1,188 @@
+/* ── Google Fonts ────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Design Tokens ──────────────────────────────────────── */
+:root {
+  /* Brand palette — referenced everywhere */
+  --navy:      #2D3047;
+  --navy-d:    #1E2138;
+  --navy-xl:   #0F1120;
+  --yellow:    #FFCB77;
+  --yellow-l:  #FFD99A;
+  --teal:      #4ECDC4;
+  --coral:     #FF6B6B;
+
+  /* Glassmorphism */
+  --glass-bg:     rgba(45, 48, 71, 0.50);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-blur:   blur(22px);
+
+  /* Typography */
+  --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── Base resets ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--navy-xl);
+  color: #E4E6F0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.1; }
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--navy-xl); }
+::-webkit-scrollbar-thumb { background: var(--navy); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--yellow); }
+
+/* ── Focus ───────────────────────────────────────────────────── */
+:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+
+/* ── Glassmorphism utility ──────────────────────────────────── */
+.glass {
+  background:    var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display:      inline-flex;
+  align-items:  center;
+  gap:          8px;
+  font-family:  var(--font-display);
+  font-weight:  700;
+  border-radius:50px;
+  padding:      13px 28px;
+  font-size:    15px;
+  cursor:       pointer;
+  border:       none;
+  transition:   transform 0.2s, box-shadow 0.2s, background 0.2s;
+  text-decoration: none;
+  letter-spacing: 0.015em;
+}
+.btn-primary {
+  background:  linear-gradient(135deg, var(--yellow) 0%, var(--yellow-l) 100%);
+  color:       var(--navy-d);
+  box-shadow:  0 0 32px rgba(255,203,119,0.28);
+}
+.btn-primary:hover {
+  transform:   translateY(-2px);
+  box-shadow:  0 8px 40px rgba(255,203,119,0.45);
+}
+.btn-ghost {
+  background:  transparent;
+  color:       #C8CAD8;
+  border:      1.5px solid rgba(255,255,255,0.18);
+}
+.btn-ghost:hover {
+  border-color: var(--yellow);
+  color:        var(--yellow);
+  transform:    translateY(-2px);
+}
+
+/* ── Section label pill ─────────────────────────────────────── */
+.tag {
+  display:     inline-flex;
+  align-items: center;
+  gap:         7px;
+  background:  rgba(255,203,119,0.1);
+  border:      1px solid rgba(255,203,119,0.22);
+  color:       var(--yellow);
+  border-radius: 50px;
+  padding:     5px 14px;
+  font-family: var(--font-display);
+  font-size:   11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+/* ── Grid bg ─────────────────────────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255,203,119,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,203,119,0.04) 1px, transparent 1px);
+  background-size: 54px 54px;
+}
+
+/* ── Card base ───────────────────────────────────────────────── */
+.card {
+  background:    var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border:        1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  box-shadow:    0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+  transition:    transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+  box-shadow:    0 20px 56px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.09);
+}
+
+/* ── Noise texture ───────────────────────────────────────────── */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ── Responsive layout helpers (inline-styled pages) ─────────── */
+/*
+ * These override inline styles at mobile breakpoints.
+ * !important is intentional — inline styles have highest specificity
+ * and CSS-class overrides require it when the value lives in style={{}}.
+ */
+
+@media (max-width: 768px) {
+  /* Booking page inner wrapper */
+  .booking-inner  { padding: 40px 20px 60px !important; }
+  /* Booking step-3 confirm card */
+  .booking-confirm { padding: 28px 22px !important; }
+
+  /* Dashboard header bar inner */
+  .dash-head { padding: 24px 20px !important; }
+  /* Dashboard body content */
+  .dash-body { padding: 32px 20px !important; }
+
+  /* About: hero section */
+  .about-hero   { padding: 64px 20px 52px !important; }
+  /* About: values / team sections */
+  .about-section { padding: 60px 20px !important; }
+  /* About: story two-column grid — reduce gap from 80px */
+  .story-grid   { padding: 60px 20px !important; gap: 40px !important; }
+
+  /* Contact: hero header */
+  .contact-head { padding: 52px 20px 36px !important; }
+  /* Contact: info + form grid */
+  .contact-body { padding: 0 20px 60px !important; }
+}
+
+@media (max-width: 480px) {
+  .booking-inner  { padding: 32px 16px 48px !important; }
+  .booking-confirm { padding: 24px 18px !important; }
+
+  .dash-head { padding: 20px 16px !important; }
+  .dash-body { padding: 24px 16px !important; }
+
+  .about-hero    { padding: 52px 16px 40px !important; }
+  .about-section { padding: 48px 16px !important; }
+  .story-grid    { padding: 48px 16px !important; gap: 28px !important; }
+
+  .contact-head  { padding: 40px 16px 28px !important; }
+  .contact-body  { padding: 0 16px 48px !important; }
+}
