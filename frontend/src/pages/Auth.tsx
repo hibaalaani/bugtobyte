@@ -22,7 +22,16 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
 
     if (mode === 'login') {
       const { error } = await signInWithEmail(email, password)
-      if (error) { toast.error(error.message); setLoading(false); return }
+      if (error) {
+        const msg = error.message.toLowerCase()
+        if (msg.includes('email') && (msg.includes('confirm') || msg.includes('verif'))) {
+          toast.error('Please confirm your email first — check your inbox.')
+        } else {
+          toast.error(error.message)
+        }
+        setLoading(false)
+        return
+      }
       toast.success('Welcome back!')
       setPage('dashboard')
     }
@@ -33,7 +42,7 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
       const { error } = await signUpWithEmail(email, password, name)
       if (error) { toast.error(error.message); setLoading(false); return }
       toast.success('Account created! Check your email to confirm.')
-      setPage('dashboard')
+      setMode('login')
     }
 
     if (mode === 'forgot') {

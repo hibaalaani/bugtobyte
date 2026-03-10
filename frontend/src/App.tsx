@@ -9,7 +9,8 @@ import AboutPage   from '@/pages/About'
 import ContactPage from '@/pages/Contact'
 import BookingPage from '@/pages/Booking'
 import AuthPage    from '@/pages/Auth'
-import Dashboard   from '@/pages/Dashboard'
+import Dashboard      from '@/pages/Dashboard'
+import ResetPassword  from '@/pages/ResetPassword'
 
 const TRANSITION = {
   initial:  { opacity: 0, y: 14 },
@@ -17,7 +18,7 @@ const TRANSITION = {
   exit:     { opacity: 0, y: -8, transition: { duration: 0.22 } },
 }
 
-const HIDE_NAV = ['login', 'signup']
+const HIDE_NAV = ['login', 'signup', 'reset-password']
 
 function AppInner() {
   const [page, setPage] = useState('home')
@@ -43,8 +44,9 @@ function AppInner() {
       case 'booking':   return <BookingPage setPage={setPage} />
       case 'login':     return <AuthPage    setPage={setPage} initialMode="login"  />
       case 'signup':    return <AuthPage    setPage={setPage} initialMode="signup" />
-      case 'dashboard': return <Dashboard   setPage={setPage} />
-      default:          return <HomePage    setPage={setPage} />
+      case 'dashboard':      return <Dashboard      setPage={setPage} />
+      case 'reset-password': return <ResetPassword  setPage={setPage} />
+      default:               return <HomePage       setPage={setPage} />
     }
   }
 

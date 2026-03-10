@@ -25,7 +25,7 @@ router.post('/', async (req: Request, res: Response) => {
       to:      process.env.ADMIN_EMAIL,
       subject: `💬 Contact: ${body.name} — ${body.subject ?? 'No subject'}`,
       html:    `<p><strong>${body.name}</strong> (${body.email})</p><p>${body.message}</p>`,
-    }).catch(() => {})
+    }).catch((e: Error) => console.error('[contact email]', e.message))
 
     res.status(201).json({ success: true })
   } catch (err: any) {
