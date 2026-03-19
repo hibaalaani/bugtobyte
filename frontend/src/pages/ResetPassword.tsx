@@ -30,7 +30,7 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
     width: '100%', background: 'rgba(255,255,255,.05)',
     border: '1px solid rgba(255,255,255,.1)', borderRadius: 8,
     padding: '13px 14px 13px 42px', color: '#F0EFE7',
-    fontFamily: 'DM Sans, sans-serif', fontSize: 15, outline: 'none',
+    fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15, outline: 'none',
   }
 
   // Determine what to show based on AuthContext state
@@ -47,13 +47,13 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
       <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} style={{ width: '100%', maxWidth: 440, position: 'relative', zIndex: 1 }}>
 
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 24, color: '#F0EFE7', marginBottom: 8 }}>
+          <div style={{ fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 800, fontSize: 24, color: '#F0EFE7', marginBottom: 8 }}>
             Bug<span style={{ color: '#00FF87' }}>To</span>Byte
           </div>
-          <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 28, color: '#F0EFE7', marginBottom: 8 }}>
+          <h1 style={{ fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 28, color: '#F0EFE7', marginBottom: 8 }}>
             {status === 'expired' ? 'Link Expired' : 'Set New Password'}
           </h1>
-          <p style={{ color: 'rgba(240,239,231,.5)', fontFamily: 'DM Sans, sans-serif', fontSize: 15 }}>
+          <p style={{ color: 'rgba(240,239,231,.5)', fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15 }}>
             {status === 'waiting' && 'Verifying your reset link…'}
             {status === 'ready'   && 'Choose a strong password for your account'}
             {status === 'expired' && 'This link has expired or already been used.'}
@@ -74,10 +74,10 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
               <div style={{ width: 52, height: 52, borderRadius: 12, background: 'rgba(251,191,36,.1)', border: '1px solid rgba(251,191,36,.25)', display: 'grid', placeItems: 'center', margin: '0 auto 20px' }}>
                 <Mail size={24} color="#fbbf24" />
               </div>
-              <p style={{ color: 'rgba(240,239,231,.55)', fontFamily: 'DM Sans, sans-serif', fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ color: 'rgba(240,239,231,.55)', fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
                 Request a new link from the login page.
               </p>
-              <button onClick={() => setPage('login')} style={{ width: '100%', background: 'linear-gradient(135deg,#00FF87,#00D4AA)', color: '#050A12', border: 'none', borderRadius: 8, padding: '14px', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+              <button onClick={() => setPage('login')} style={{ width: '100%', background: 'linear-gradient(135deg,#00FF87,#00D4AA)', color: '#050A12', border: 'none', borderRadius: 8, padding: '14px', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
                 Back to Login
               </button>
             </div>
@@ -86,7 +86,7 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
           {status === 'ready' && (
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: 18 }}>
-                <label style={{ display: 'block', fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>New Password</label>
+                <label style={{ display: 'block', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>New Password</label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,239,231,.35)' }} />
                   <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 8 characters" required style={inputStyle}
@@ -99,7 +99,7 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
               </div>
 
               <div style={{ marginBottom: 28 }}>
-                <label style={{ display: 'block', fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>Confirm Password</label>
+                <label style={{ display: 'block', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>Confirm Password</label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,239,231,.35)' }} />
                   <input type={showPass ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Repeat your password" required style={{ ...inputStyle, paddingRight: 14 }}
@@ -108,7 +108,7 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
                 </div>
               </div>
 
-              <button type="submit" disabled={submitting} style={{ width: '100%', background: 'linear-gradient(135deg,#00FF87,#00D4AA)', color: '#050A12', border: 'none', borderRadius: 8, padding: '14px', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: submitting ? 0.6 : 1 }}>
+              <button type="submit" disabled={submitting} style={{ width: '100%', background: 'linear-gradient(135deg,#00FF87,#00D4AA)', color: '#050A12', border: 'none', borderRadius: 8, padding: '14px', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: submitting ? 0.6 : 1 }}>
                 {submitting ? 'Updating...' : 'Update Password'}
                 {!submitting && <ArrowRight size={16} />}
               </button>

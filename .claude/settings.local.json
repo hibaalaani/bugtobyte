@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -L \"useLanguage\\\\|i18n\" /h/A_hiba_WORK/bugtobyte-v2-refactored/bugtobyte-v2/frontend/src/pages/*.tsx)"
+    ]
+  }
+}

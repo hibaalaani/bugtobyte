@@ -66,13 +66,13 @@ export default function ConfirmModal({
             </div>
 
             <h3 style={{
-              fontFamily: 'Syne, sans-serif', fontWeight: 700,
+              fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700,
               fontSize: 20, color: '#F0EFE7', marginBottom: 10,
             }}>
               {title}
             </h3>
             <p style={{
-              fontFamily: 'DM Sans, sans-serif', fontSize: 15,
+              fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15,
               color: 'rgba(240,239,231,.55)', lineHeight: 1.6,
               marginBottom: 28,
             }}>
@@ -89,7 +89,7 @@ export default function ConfirmModal({
                   border: '1px solid rgba(255,255,255,.1)',
                   borderRadius: 8, padding: '10px 22px',
                   color: 'rgba(240,239,231,.65)',
-                  fontFamily: 'Syne, sans-serif', fontWeight: 600,
+                  fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600,
                   fontSize: 14, cursor: 'pointer',
                 }}
               >
@@ -104,7 +104,7 @@ export default function ConfirmModal({
                   border: '1px solid rgba(248,113,113,.35)',
                   borderRadius: 8, padding: '10px 22px',
                   color: '#f87171',
-                  fontFamily: 'Syne, sans-serif', fontWeight: 700,
+                  fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700,
                   fontSize: 14, cursor: 'pointer',
                 }}
               >

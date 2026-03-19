@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
 import toast from 'react-hot-toast'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
 import Navbar      from '@/components/Navbar'
 import HomePage    from '@/pages/Home'
 import AboutPage   from '@/pages/About'
@@ -22,6 +24,8 @@ const HIDE_NAV = ['login', 'signup', 'reset-password']
 
 function AppInner() {
   const [page, setPage] = useState('home')
+  const { isRTL } = useLanguage()
+  const { isDark } = useTheme()
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
@@ -51,8 +55,8 @@ function AppInner() {
   }
 
   return (
-    <div style={{ background: '#0F1120', minHeight: '100vh', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
-      <Toaster position="top-center" toastOptions={{ style: { background: '#1a1f35', color: '#F0EFE7', border: '1px solid rgba(255,255,255,.1)' } }} />
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', minHeight: '100vh', fontFamily: isRTL ? '"Cairo", "Inter", sans-serif' : '"Inter", sans-serif' }}>
+      <Toaster position="top-center" toastOptions={{ style: { background: isDark ? '#1a1f35' : '#ffffff', color: isDark ? '#F0EFE7' : '#1A1F3A', border: '1px solid var(--border-color)' } }} />
       {!HIDE_NAV.includes(page) && <Navbar page={page} setPage={setPage} />}
       <AnimatePresence mode="wait">
         <motion.div key={page} {...TRANSITION}>
@@ -65,8 +69,12 @@ function AppInner() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppInner />
-    </AuthProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppInner />
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   )
 }

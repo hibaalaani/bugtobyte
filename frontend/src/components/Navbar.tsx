@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, LogOut, User } from 'lucide-react'
+import { Menu, X, LogOut, User, Sun, Moon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-
-const NAV_LINKS = [
-  { label: 'Home',    page: 'home'    },
-  { label: 'About',   page: 'about'   },
-  { label: 'Contact', page: 'contact' },
-]
+import { useLanguage } from '@/contexts/LanguageContext'
+import { useTheme } from '@/contexts/ThemeContext'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 export default function Navbar({ page, setPage }: { page: string; setPage: (p: string) => void }) {
   const { profile, signOut } = useAuth()
-  const [open,    setOpen]    = useState(false)
+  const { tr } = useLanguage()
+  const { isDark, toggleTheme } = useTheme()
+  const [open,     setOpen]     = useState(false)
   const [scrolled, setScrolled] = useState(false)
+
+  const NAV_LINKS = [
+    { label: tr.nav.home,    page: 'home'    },
+    { label: tr.nav.about,   page: 'about'   },
+    { label: tr.nav.contact, page: 'contact' },
+  ]
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 24)
@@ -22,6 +27,10 @@ export default function Navbar({ page, setPage }: { page: string; setPage: (p: s
 
   const go = (p: string) => { setPage(p); setOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
+  const navBg = scrolled
+    ? 'var(--bg-nav)'
+    : isDark ? 'transparent' : 'rgba(238,242,255,0.90)'
+
   return (
     <>
       <motion.nav
@@ -29,54 +38,118 @@ export default function Navbar({ page, setPage }: { page: string; setPage: (p: s
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         style={{
-          position:     'fixed', top: 0, left: 0, right: 0, zIndex: 200,
-          background:   scrolled ? 'rgba(5,10,18,.92)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,.06)' : 'none',
-          transition:   'all .35s ease',
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+          background: navBg,
+          backdropFilter: (scrolled || !isDark) ? 'blur(20px)' : 'none',
+          borderBottom: (scrolled || !isDark) ? '1px solid var(--border-color)' : 'none',
+          transition: 'all .35s ease',
         }}
       >
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', height: 68, display: 'flex', alignItems: 'center', gap: 32 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px', height: 72, display: 'flex', alignItems: 'center', gap: 8 }}>
 
           {/* Logo */}
-          <button onClick={() => go('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 20, color: '#F0EFE7', letterSpacing: '-0.02em', flexShrink: 0 }}>
-            Bug<span style={{ color: '#00FF87' }}>To</span>Byte
+          <button onClick={() => go('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0, display: 'flex', alignItems: 'center', marginRight: 8 }}>
+            <span style={{
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              fontWeight: 900,
+              fontSize: 28,
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              display: 'flex',
+              alignItems: 'baseline',
+              userSelect: 'none',
+            }}>
+              <span style={{ color: isDark ? '#F0F2FF' : '#1A1F3A', WebkitTextStroke: '2px #FFD60A', paintOrder: 'stroke fill' }}>Bug</span>
+              <span style={{ color: '#FFD60A', WebkitTextStroke: isDark ? '2px #0A0C1A' : '2px #1A1F3A', paintOrder: 'stroke fill' }}>To</span>
+              <span style={{ color: isDark ? '#F0F2FF' : '#1A1F3A', WebkitTextStroke: '2px #00E5FF', paintOrder: 'stroke fill' }}>Byte</span>
+            </span>
           </button>
 
-          {/* Desktop nav */}
-          <div className="nav-links" style={{ display: 'flex', gap: 4, flex: 1 }}>
+          {/* Desktop nav links */}
+          <div className="nav-links" style={{ display: 'flex', gap: 2, flex: 1 }}>
             {NAV_LINKS.map(link => (
-              <button key={link.page} onClick={() => go(link.page)} style={{ background: page === link.page ? 'rgba(0,255,135,.08)' : 'none', border: 'none', borderRadius: 6, padding: '8px 16px', color: page === link.page ? '#00FF87' : 'rgba(240,239,231,.6)', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 14, transition: 'all .2s' }} onMouseEnter={e => { if (page !== link.page) e.currentTarget.style.color='rgba(240,239,231,.9)' }} onMouseLeave={e => { if (page !== link.page) e.currentTarget.style.color='rgba(240,239,231,.6)' }}>
+              <button key={link.page} onClick={() => go(link.page)}
+                style={{
+                  background: page === link.page
+                    ? (isDark ? 'rgba(255,214,10,0.10)' : 'rgba(180,83,9,0.09)')
+                    : 'none',
+                  border: 'none', borderRadius: 8,
+                  padding: '7px 15px',
+                  color: page === link.page ? 'var(--nav-link-active)' : 'var(--nav-link-color)',
+                  cursor: 'pointer', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 14,
+                  transition: 'all .2s',
+                }}
+                onMouseEnter={e => { if (page !== link.page) e.currentTarget.style.color = 'var(--nav-link-hover)' }}
+                onMouseLeave={e => { if (page !== link.page) e.currentTarget.style.color = 'var(--nav-link-color)' }}>
                 {link.label}
               </button>
             ))}
           </div>
 
-          {/* Right actions */}
-          <div className="nav-actions" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {/* Right side actions */}
+          <div className="nav-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+
+            {/* Language switcher */}
+            <LanguageSwitcher />
+
+            {/* Divider */}
+            <div style={{ width: 1, height: 22, background: 'var(--border-color)' }} />
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              style={{
+                background: 'none',
+                border: '1px solid var(--border-color)',
+                borderRadius: 8,
+                padding: '6px 8px',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'all .2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = isDark ? '#FFD60A' : '#E8960A'; e.currentTarget.style.color = isDark ? '#FFD60A' : '#E8960A' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-muted)' }}
+            >
+              {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+
+            {/* Auth */}
             {profile ? (
               <>
-                <button onClick={() => go('dashboard')} style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 6, padding: '8px 16px', color: '#F0EFE7', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 7 }}>
-                  <User size={14} /> {profile.full_name?.split(' ')[0] ?? 'Dashboard'}
+                <button onClick={() => go('dashboard')}
+                  style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-primary)', cursor: 'pointer', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <User size={14} /> {profile.full_name?.split(' ')[0] ?? tr.nav.dashboard}
                 </button>
-                <button onClick={async () => { await signOut(); go('home'); }} style={{ background: 'none', border: '1px solid rgba(255,255,255,.1)', borderRadius: 6, padding: '8px 12px', color: 'rgba(240,239,231,.5)', cursor: 'pointer' }}>
+                <button onClick={async () => { await signOut(); go('home') }}
+                  style={{ background: 'none', border: '1px solid var(--border-color)', borderRadius: 8, padding: '6px 10px', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                   <LogOut size={14} />
                 </button>
               </>
             ) : (
-              <>
-                <button onClick={() => go('login')} style={{ background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '8px 18px', color: 'rgba(240,239,231,.75)', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 13, transition: 'all .2s' }} onMouseEnter={e => e.currentTarget.style.borderColor='rgba(0,255,135,.4)'} onMouseLeave={e => e.currentTarget.style.borderColor='rgba(255,255,255,.12)'}>
-                  Sign In
-                </button>
-                <button onClick={() => go('booking')} style={{ background: 'linear-gradient(135deg,#00FF87,#00D4AA)', border: 'none', borderRadius: 6, padding: '9px 20px', color: '#050A12', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, boxShadow: '0 0 24px rgba(0,255,135,.25)' }}>
-                  Book Demo
-                </button>
-              </>
+              <button onClick={() => go('login')}
+                style={{
+                  background: 'linear-gradient(135deg, #FFD60A, #FFE040)',
+                  border: 'none', borderRadius: 8,
+                  padding: '7px 18px',
+                  color: '#0A0C1A',
+                  cursor: 'pointer', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 13,
+                  transition: 'all .2s',
+                  boxShadow: '0 2px 12px rgba(255,214,10,0.35)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(255,214,10,0.55)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 2px 12px rgba(255,214,10,0.35)' }}>
+                {tr.nav.signIn}
+              </button>
             )}
           </div>
 
           {/* Mobile hamburger */}
-          <button onClick={() => setOpen(o => !o)} style={{ display: 'none', background: 'none', border: 'none', color: '#F0EFE7', cursor: 'pointer', padding: 4 }} className="mobile-menu-btn">
+          <button onClick={() => setOpen(o => !o)}
+            style={{ display: 'none', background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 4, marginLeft: 'auto' }}
+            className="mobile-menu-btn">
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
@@ -85,15 +158,37 @@ export default function Navbar({ page, setPage }: { page: string; setPage: (p: s
       {/* Mobile menu */}
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }} transition={{ duration:.25 }} style={{ position:'fixed', top:68, left:0, right:0, zIndex:199, background:'rgba(5,10,18,.97)', borderBottom:'1px solid rgba(255,255,255,.08)', padding:'20px 32px 28px' }}>
-            <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
-              {[...NAV_LINKS, { label:'Book a Demo', page:'booking' }].map(link => (
-                <button key={link.page} onClick={() => go(link.page)} style={{ background:'none', border:'none', textAlign:'left', padding:'12px 4px', color:'#F0EFE7', cursor:'pointer', fontFamily:'Syne, sans-serif', fontWeight:600, fontSize:17, borderBottom:'1px solid rgba(255,255,255,.04)' }}>{link.label}</button>
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: .25 }}
+            style={{ position: 'fixed', top: 72, left: 0, right: 0, zIndex: 199, background: 'var(--bg-mobile-menu)', borderBottom: '1px solid var(--border-color)', padding: '20px 28px 28px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+              <LanguageSwitcher />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {NAV_LINKS.map(link => (
+                <button key={link.page} onClick={() => go(link.page)}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px 4px', color: 'var(--text-primary)', cursor: 'pointer', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 17, borderBottom: '1px solid var(--divider)' }}>
+                  {link.label}
+                </button>
               ))}
+              <div style={{ padding: '14px 4px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 15 }}>
+                  {isDark ? 'Dark mode' : 'Light mode'}
+                </span>
+                <button onClick={toggleTheme}
+                  style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '6px 8px', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  {isDark ? <Sun size={15} /> : <Moon size={15} />}
+                </button>
+              </div>
               {profile ? (
-                <button onClick={async () => { await signOut(); go('home'); }} style={{ background:'none', border:'none', textAlign:'left', padding:'12px 4px', color:'rgba(240,239,231,.45)', cursor:'pointer', fontFamily:'Syne, sans-serif', fontWeight:600, fontSize:17 }}>Sign Out</button>
+                <button onClick={async () => { await signOut(); go('home') }}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', padding: '12px 4px', color: 'var(--text-muted)', cursor: 'pointer', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 17 }}>
+                  {tr.nav.signOut}
+                </button>
               ) : (
-                <button onClick={() => go('login')} style={{ background:'none', border:'none', textAlign:'left', padding:'12px 4px', color:'rgba(240,239,231,.7)', cursor:'pointer', fontFamily:'Syne, sans-serif', fontWeight:600, fontSize:17 }}>Sign In</button>
+                <button onClick={() => go('login')}
+                  style={{ marginTop: 8, background: 'linear-gradient(135deg, #FFD60A, #FFE040)', border: 'none', borderRadius: 10, padding: '12px', color: '#0A0C1A', cursor: 'pointer', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 15, textAlign: 'center' }}>
+                  {tr.nav.signIn}
+                </button>
               )}
             </div>
           </motion.div>

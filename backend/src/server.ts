@@ -91,7 +91,7 @@ app.post('/api/stripe/create-checkout', requireAuth, async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode:                 'payment',
-      line_items: [{ price_data: { currency: 'usd', product_data: { name: productName }, unit_amount: priceAmount }, quantity: 1 }],
+      line_items: [{ price_data: { currency: 'eur', product_data: { name: productName }, unit_amount: priceAmount}, quantity: 1 }],
       metadata:    { booking_id },
       success_url: `${process.env.CLIENT_ORIGIN}/?payment=success`,
       cancel_url:  `${process.env.CLIENT_ORIGIN}/?payment=cancelled`,
