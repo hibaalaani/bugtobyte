@@ -13,6 +13,7 @@ import BookingPage from '@/pages/Booking'
 import AuthPage    from '@/pages/Auth'
 import Dashboard      from '@/pages/Dashboard'
 import ResetPassword  from '@/pages/ResetPassword'
+import TermsPage      from '@/pages/Terms'
 
 const TRANSITION = {
   initial:  { opacity: 0, y: 14 },
@@ -50,6 +51,7 @@ function AppInner() {
       case 'signup':    return <AuthPage    setPage={setPage} initialMode="signup" />
       case 'dashboard':      return <Dashboard      setPage={setPage} />
       case 'reset-password': return <ResetPassword  setPage={setPage} />
+      case 'terms':          return <TermsPage      setPage={setPage} />
       default:               return <HomePage       setPage={setPage} />
     }
   }

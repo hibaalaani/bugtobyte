@@ -4,7 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Puzzle, Brain, Code2, Clock, Users,
-  Star, ArrowRight, Zap, CheckCircle2, ChevronDown,
+  Star, ArrowRight, Zap, CheckCircle2, ChevronDown, Sparkles,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -15,17 +15,18 @@ export interface CourseData {
   subtitle:    string
   description: string
   ageGroup:    '7-9' | '10-12' | '13-14'
-  tool:        'Scratch' | 'AI + Scratch' | 'Python'
+  tool:        'Scratch' | 'AI + Scratch' | 'Python' | 'Claude AI'
   sessions:    number
   sessionLen:  string
   maxStudents: number
   priceEUR:    number
   skills:      string[]
   curriculum:  string[]   // "Week N — Topic" strings
-  badge?:      string
-  color:       'mint' | 'teal' | 'coral'
-  image:         string
+  badge?:         string
+  color:          'mint' | 'teal' | 'coral' | 'violet'
+  image:          string
   imagePosition?: string
+  comingSoon?:    boolean
 }
 
 interface CourseCardProps {
@@ -34,16 +35,17 @@ interface CourseCardProps {
   onBook?: (course: CourseData) => void
 }
 
-const TOOL_ICON = { Scratch: Puzzle, 'AI + Scratch': Brain, Python: Code2 }
+const TOOL_ICON = { Scratch: Puzzle, 'AI + Scratch': Brain, Python: Code2, 'Claude AI': Sparkles }
 
 export default function CourseCard({ course, index, onBook }: CourseCardProps) {
   const ref    = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-60px 0px' })
   const { isDark } = useTheme()
   const c = {
-    mint:  { text: isDark ? '#A8EDCB' : '#0E9B64', border: isDark ? 'rgba(168,237,203,0.28)' : 'rgba(30,184,122,0.35)', bg: isDark ? 'rgba(168,237,203,0.08)' : 'rgba(168,237,203,0.12)', glow: isDark ? 'rgba(168,237,203,0.15)' : 'rgba(168,237,203,0.10)', pill: isDark ? 'rgba(168,237,203,0.10)' : 'rgba(168,237,203,0.18)', pillText: isDark ? '#A8EDCB' : '#0E9B64', imgOverlay: 'rgba(30,184,122,0.55)' },
-    teal:  { text: isDark ? '#4ECDC4' : '#0D8A83', border: isDark ? 'rgba(78,205,196,0.28)' : 'rgba(78,205,196,0.35)',   bg: isDark ? 'rgba(78,205,196,0.08)'  : 'rgba(78,205,196,0.12)',  glow: isDark ? 'rgba(78,205,196,0.15)'  : 'rgba(78,205,196,0.10)',  pill: isDark ? 'rgba(78,205,196,0.10)'  : 'rgba(78,205,196,0.18)',  pillText: isDark ? '#4ECDC4' : '#0D8A83', imgOverlay: 'rgba(20,168,160,0.55)' },
-    coral: { text: isDark ? '#FF8A8A' : '#C93030', border: isDark ? 'rgba(255,107,107,0.28)' : 'rgba(255,107,107,0.35)', bg: isDark ? 'rgba(255,107,107,0.08)' : 'rgba(255,107,107,0.12)', glow: isDark ? 'rgba(255,107,107,0.15)' : 'rgba(255,107,107,0.10)', pill: isDark ? 'rgba(255,107,107,0.10)' : 'rgba(255,107,107,0.18)', pillText: isDark ? '#FF8A8A' : '#C93030', imgOverlay: 'rgba(232,64,64,0.55)'  },
+    mint:   { text: isDark ? '#A8EDCB' : '#0E9B64', border: isDark ? 'rgba(168,237,203,0.28)' : 'rgba(30,184,122,0.35)',  bg: isDark ? 'rgba(168,237,203,0.08)' : 'rgba(168,237,203,0.12)', imgOverlay: 'rgba(30,184,122,0.55)'  },
+    teal:   { text: isDark ? '#4ECDC4' : '#0D8A83', border: isDark ? 'rgba(78,205,196,0.28)'  : 'rgba(78,205,196,0.35)',  bg: isDark ? 'rgba(78,205,196,0.08)'  : 'rgba(78,205,196,0.12)',  imgOverlay: 'rgba(20,168,160,0.55)'  },
+    coral:  { text: isDark ? '#FF8A8A' : '#C93030', border: isDark ? 'rgba(255,107,107,0.28)' : 'rgba(255,107,107,0.35)', bg: isDark ? 'rgba(255,107,107,0.08)' : 'rgba(255,107,107,0.12)', imgOverlay: 'rgba(232,64,64,0.55)'   },
+    violet: { text: isDark ? '#D580FF' : '#7B00D4', border: isDark ? 'rgba(200,88,255,0.30)'  : 'rgba(123,0,212,0.28)',   bg: isDark ? 'rgba(200,88,255,0.08)'  : 'rgba(200,88,255,0.10)',  imgOverlay: 'rgba(123,0,212,0.55)'   },
   }[course.color]
   const Icon   = TOOL_ICON[course.tool] ?? Zap
   const [showCurriculum, setShowCurriculum] = useState(false)
@@ -71,14 +73,34 @@ export default function CourseCard({ course, index, onBook }: CourseCardProps) {
     >
       {/* ── Image ── */}
       <div className="relative overflow-hidden" style={{ height: 210 }}>
-        {/* Colored background so no grey shows if photo has empty areas */}
-        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${c.text}33 0%, ${c.text}11 100%)` }} />
-        <img
-          src={course.image}
-          alt={course.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-106"
-          style={{ objectPosition: 'center center' }}
-        />
+        {course.image ? (
+          <>
+            <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${c.text}33 0%, ${c.text}11 100%)` }} />
+            <img src={course.image} alt={course.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              style={{ objectPosition: 'center center' }}
+            />
+          </>
+        ) : (
+          /* No photo — animated gradient as intentional visual */
+          <>
+            <motion.div className="absolute inset-0"
+              animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+              style={{ background: `linear-gradient(135deg, ${c.text}55, ${c.text}18, ${c.text}66, ${c.text}22, ${c.text}55)`, backgroundSize: '300% 300%' }}
+            />
+            {/* Floating AI orb */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.div
+                animate={{ scale: [1, 1.08, 1], opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                className="flex items-center justify-center w-20 h-20 rounded-full"
+                style={{ background: `radial-gradient(circle, ${c.text}55 0%, transparent 70%)`, border: `2px solid ${c.text}66` }}>
+                <Sparkles size={36} style={{ color: c.text }} />
+              </motion.div>
+            </div>
+          </>
+        )}
         {/* Scrim: dark at bottom for readability */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 40%, rgba(0,0,0,0.45) 100%)' }} />
 
@@ -198,19 +220,19 @@ export default function CourseCard({ course, index, onBook }: CourseCardProps) {
 
       {/* Footer */}
       <div className="px-6 pb-6 mt-auto flex items-center justify-between gap-3">
-        <div>
-          <span className="font-display font-extrabold text-2xl" style={{ color: 'var(--text-primary)' }}>€{totalPrice}</span>
-          <span className="text-[12px] ml-1" style={{ color: 'var(--text-muted)' }}>{tr.courses.perCourse}</span>
-          <div className="text-[11px] mt-0.5" style={{ color: c.text }}>
-            €{SESSION_PRICE} {tr.courses.perSession}
+          <div>
+            <span className="font-display font-extrabold text-2xl" style={{ color: 'var(--text-primary)' }}>€{totalPrice}</span>
+            <span className="text-[12px] ml-1" style={{ color: 'var(--text-muted)' }}>{tr.courses.perCourse}</span>
+            <div className="text-[11px] mt-0.5" style={{ color: c.text }}>
+              €{SESSION_PRICE} {tr.courses.perSession}
+            </div>
           </div>
-        </div>
-        <motion.button onClick={() => onBook?.(course)}
-          whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full font-display font-bold text-[14px]"
-          style={{ background: 'linear-gradient(135deg,#FFD60A,#FFE040)', color: '#0A0C1A', boxShadow: '0 0 28px rgba(255,214,10,0.40)' }}>
-          {tr.courses.bookNow} <ArrowRight size={14} strokeWidth={2.5} />
-        </motion.button>
+          <motion.button onClick={() => onBook?.(course)}
+            whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full font-display font-bold text-[14px]"
+            style={{ background: 'linear-gradient(135deg,#FFD60A,#FFE040)', color: '#0A0C1A', boxShadow: '0 0 28px rgba(255,214,10,0.40)' }}>
+            {tr.courses.bookNow} <ArrowRight size={14} strokeWidth={2.5} />
+          </motion.button>
       </div>
     </motion.div>
   )
@@ -276,5 +298,30 @@ export const COURSES: CourseData[] = [
     ],
     badge:'Advanced Track', color:'coral',
     image:'/teenage-py.png', imagePosition:'60% 30%',
+  },
+  {
+    id:'4', slug:'claude-ai-for-kids',
+    title:'Claude AI for Kids', subtitle:'Prompt Engineering & AI Literacy',
+    description:"Kids learn to talk to AI like a pro — writing precise prompts, building their own chatbots, and understanding how tools like Claude actually work. The most future-ready skill they can learn right now.",
+    ageGroup:'10-12', tool:'Claude AI', sessions:8, sessionLen:'60 min', maxStudents:5, priceEUR:0,
+    skills:[
+      'Prompt engineering fundamentals',
+      'Build a custom chatbot with a persona',
+      'AI ethics & responsible use',
+      'Using AI as a learning & creativity tool',
+      'Critical thinking — when to trust AI',
+    ],
+    curriculum:[
+      'What is Claude? — how large language models think vs humans',
+      'The Art of Asking — vague vs specific prompts, the 3 elements of a great prompt',
+      'Claude as a Story Partner — co-write a story, direct characters & plot',
+      'Claude as a Study Buddy — summarise, quiz, explain. How to verify AI answers',
+      'Build Your Own Chatbot — system prompts, giving Claude a persona & rules',
+      'AI Ethics & Safety — bias, privacy, fake content, what AI should never do',
+      'Solve a Real Problem — pick a real-world challenge, design an AI-powered solution',
+      'Demo Day — present your chatbot & AI project to the class and parents',
+    ],
+    badge:'New', color:'violet',
+    image:'',
   },
 ]

@@ -246,7 +246,7 @@ export default function HomePage({ setPage }: { setPage: (p: string) => void }) 
               <p className="text-slate-600 text-[15px] leading-relaxed">{tr.courses.subtitle}</p>
             </Reveal>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {COURSES.map((course, i) => (
               <div key={course.id} className="flex flex-col">
                 <CourseCard course={course} index={i} onBook={() => go('booking')} />
@@ -434,7 +434,10 @@ export default function HomePage({ setPage }: { setPage: (p: string) => void }) 
           </div>
           <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4" style={{ borderTop: '1px solid var(--divider)' }}>
             <p className="text-slate-600 text-[13px]">© {new Date().getFullYear()} BugToByte Academy. {tr.footer.rights}</p>
-            <button onClick={() => setPage('login')} className="text-slate-600 text-[12px] hover:text-slate-500 transition-colors">{tr.footer.staffLogin}</button>
+            <div className="flex items-center gap-5">
+              <button onClick={() => go('terms')} className="text-slate-600 text-[12px] hover:text-brand-yellow transition-colors">Terms & Conditions</button>
+              <button onClick={() => setPage('login')} className="text-slate-600 text-[12px] hover:text-slate-500 transition-colors">{tr.footer.staffLogin}</button>
+            </div>
           </div>
         </div>
       </footer>
