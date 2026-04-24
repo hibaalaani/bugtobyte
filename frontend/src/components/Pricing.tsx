@@ -8,9 +8,9 @@ import { useTheme } from '@/contexts/ThemeContext'
 // Structural plan data — each card has its own neon color
 // ─────────────────────────────────────────────────────────────
 const PLAN_STRUCTURE = [
-  { id: 'starter',  icon: Zap,    price: 79.99,  perSession: '€9.99', color: '#00E5FF', colorRgb: '0,229,255',   bgLight: '#E8FFFE', featured: false },
-  { id: 'explorer', icon: Star,   price: 149.99, perSession: '€9.37', color: '#FFD60A', colorRgb: '255,214,10',  bgLight: '#FFFBF0', featured: true  },
-  { id: 'prodigy',  icon: Rocket, price: 239.99, perSession: '€9.23', color: '#FF4081', colorRgb: '255,64,129',  bgLight: '#FFF0F5', featured: false },
+  { id: 'starter',  icon: Zap,    price: 99.90,  perSession: '€9.99', color: '#00E5FF', colorRgb: '0,229,255',   bgLight: '#E8FFFE', featured: false },
+  { id: 'explorer', icon: Star,   price: 219.99, perSession: '€9.13', color: '#FFD60A', colorRgb: '255,214,10',  bgLight: '#FFFBF0', featured: true  },
+  { id: 'prodigy',  icon: Rocket, price: 349.99, perSession: '€9.21', color: '#FF4081', colorRgb: '255,64,129',  bgLight: '#FFF0F5', featured: false },
 ]
 
 // ─────────────────────────────────────────────────────────────

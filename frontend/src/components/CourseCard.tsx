@@ -4,7 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Puzzle, Brain, Code2, Clock, Users,
-  Star, ArrowRight, Zap, CheckCircle2, ChevronDown, Sparkles,
+  ArrowRight, Zap, CheckCircle2, ChevronDown, Sparkles,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────
@@ -14,19 +14,18 @@ export interface CourseData {
   title:       string
   subtitle:    string
   description: string
-  ageGroup:    '7-9' | '10-12' | '13-14'
-  tool:        'Scratch' | 'AI + Scratch' | 'Python' | 'Claude AI'
+  ageGroup:    '7-9' | '10-12' | '13+'
+  tool:        'Scratch' | 'AI Tools' | 'Python'
   sessions:    number
   sessionLen:  string
   maxStudents: number
   priceEUR:    number
   skills:      string[]
-  curriculum:  string[]   // "Week N — Topic" strings
-  badge?:         string
-  color:          'mint' | 'teal' | 'coral' | 'violet'
-  image:          string
+  curriculum:  string[]
+  level:       'Beginner' | 'Intermediate' | 'Advanced'
+  color:       'mint' | 'teal' | 'coral' | 'violet'
+  image:       string
   imagePosition?: string
-  comingSoon?:    boolean
 }
 
 interface CourseCardProps {
@@ -35,12 +34,23 @@ interface CourseCardProps {
   onBook?: (course: CourseData) => void
 }
 
-const TOOL_ICON = { Scratch: Puzzle, 'AI + Scratch': Brain, Python: Code2, 'Claude AI': Sparkles }
+const TOOL_ICON = { Scratch: Puzzle, 'AI Tools': Brain, Python: Code2 }
+
+const LEVEL_COLOR = {
+  Beginner:     { bg: 'rgba(14,155,100,0.12)', text: '#0E9B64', border: 'rgba(14,155,100,0.30)' },
+  Intermediate: { bg: 'rgba(201,48,48,0.10)',  text: '#C93030', border: 'rgba(201,48,48,0.28)' },
+  Advanced:     { bg: 'rgba(123,0,212,0.10)',  text: '#7B00D4', border: 'rgba(123,0,212,0.28)' },
+}
 
 export default function CourseCard({ course, index, onBook }: CourseCardProps) {
   const ref    = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-60px 0px' })
   const { isDark } = useTheme()
+  const step = String(index + 1).padStart(2, '0')
+  const lc = isDark
+    ? { Beginner: { bg: 'rgba(168,237,203,0.12)', text: '#A8EDCB', border: 'rgba(168,237,203,0.30)' }, Intermediate: { bg: 'rgba(255,138,138,0.12)', text: '#FF8A8A', border: 'rgba(255,138,138,0.30)' }, Advanced: { bg: 'rgba(213,128,255,0.12)', text: '#D580FF', border: 'rgba(213,128,255,0.30)' } }
+    : LEVEL_COLOR
+  const lv = lc[course.level]
   const c = {
     mint:   { text: isDark ? '#A8EDCB' : '#0E9B64', border: isDark ? 'rgba(168,237,203,0.28)' : 'rgba(30,184,122,0.35)',  bg: isDark ? 'rgba(168,237,203,0.08)' : 'rgba(168,237,203,0.12)', imgOverlay: 'rgba(30,184,122,0.55)'  },
     teal:   { text: isDark ? '#4ECDC4' : '#0D8A83', border: isDark ? 'rgba(78,205,196,0.28)'  : 'rgba(78,205,196,0.35)',  bg: isDark ? 'rgba(78,205,196,0.08)'  : 'rgba(78,205,196,0.12)',  imgOverlay: 'rgba(20,168,160,0.55)'  },
@@ -113,13 +123,11 @@ export default function CourseCard({ course, index, onBook }: CourseCardProps) {
           Ages {course.ageGroup}
         </span>
 
-        {/* Course badge — top right */}
-        {course.badge && (
-          <span className="absolute top-3 right-3 flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-full font-display"
-            style={{ background: 'rgba(255,214,10,0.96)', color: '#0A0C1A' }}>
-            <Star size={9} fill="currentColor" /> {course.badge}
-          </span>
-        )}
+        {/* Step badge — top right */}
+        <span className="absolute top-3 right-3 text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full font-display text-white"
+          style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}>
+          Step {step}
+        </span>
 
         {/* Icon — bottom left, inside image */}
         <motion.div
@@ -131,9 +139,17 @@ export default function CourseCard({ course, index, onBook }: CourseCardProps) {
       </div>
 
       {/* Title */}
-      <div className="px-5 pt-4 pb-2">
+      <div className="px-5 pt-4 pb-1">
         <h3 className="font-display font-bold text-xl leading-tight mb-1" style={{ color: 'var(--text-primary)' }}>{course.title}</h3>
         <p className="text-[13px] font-semibold" style={{ color: c.text }}>{td.subtitle}</p>
+      </div>
+
+      {/* Level badge */}
+      <div className="px-5 pb-3">
+        <span className="inline-flex items-center text-[11px] font-bold tracking-widest uppercase px-3 py-1 rounded-full font-display"
+          style={{ background: lv.bg, color: lv.text, border: `1.5px solid ${lv.border}` }}>
+          {course.level}
+        </span>
       </div>
 
       {/* Description */}
@@ -219,7 +235,8 @@ export default function CourseCard({ course, index, onBook }: CourseCardProps) {
       <div className="mx-6 h-px mb-5" style={{ background: 'var(--border-color)' }} />
 
       {/* Footer */}
-      <div className="px-6 pb-6 mt-auto flex items-center justify-between gap-3">
+      <div className="px-6 pb-6 mt-auto">
+        <div className="flex items-center justify-between gap-2 mb-4">
           <div>
             <span className="font-display font-extrabold text-2xl" style={{ color: 'var(--text-primary)' }}>€{totalPrice}</span>
             <span className="text-[12px] ml-1" style={{ color: 'var(--text-muted)' }}>{tr.courses.perCourse}</span>
@@ -227,25 +244,30 @@ export default function CourseCard({ course, index, onBook }: CourseCardProps) {
               €{SESSION_PRICE} {tr.courses.perSession}
             </div>
           </div>
-          <motion.button onClick={() => onBook?.(course)}
-            whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full font-display font-bold text-[14px]"
-            style={{ background: 'linear-gradient(135deg,#FFD60A,#FFE040)', color: '#0A0C1A', boxShadow: '0 0 28px rgba(255,214,10,0.40)' }}>
-            {tr.courses.bookNow} <ArrowRight size={14} strokeWidth={2.5} />
-          </motion.button>
+        </div>
+        <motion.button onClick={() => onBook?.(course)}
+          whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.97 }}
+          className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-display font-bold text-[15px] text-white"
+          style={{
+            background: `linear-gradient(135deg, ${c.text} 0%, ${c.text}CC 100%)`,
+            boxShadow: `0 6px 28px ${c.text}55, 0 2px 8px ${c.text}33`,
+          }}>
+          {tr.courses.bookNow} <ArrowRight size={16} strokeWidth={2.5} />
+        </motion.button>
       </div>
     </motion.div>
   )
 }
 
-// ── Real BugToByte course data ─────────────────────────────────
+// ── BugToByte course data ──────────────────────────────────────
 export const COURSES: CourseData[] = [
   {
-    id:'1', slug:'scratch-creators',
-    title:'Scratch Creators', subtitle:'Block Coding for Beginners',
-    description:"Young learners dive into MIT's Scratch environment to design animated stories, interactive games, and creative simulations. No typing required — just drag, drop, and discover the joy of making things move.",
-    ageGroup:'7-9', tool:'Scratch', sessions:8, sessionLen:'45 min', maxStudents:6, priceEUR:160,
-    skills:['Sequences & logic','Loops and conditionals','Events & animation','Creative project design','Computational thinking'],
+    id:'1', slug:'scratch-explorers',
+    title:'Scratch Explorers', subtitle:'Block Coding for Beginners',
+    description:"Join live interactive sessions where we turn ideas into games. Kids learn logic through play with real-time guidance from their instructor.",
+    ageGroup:'7-9', tool:'Scratch', sessions:12, sessionLen:'60 min', maxStudents:6, priceEUR:119.88,
+    level:'Beginner',
+    skills:['Building interactive stories','Game physics (gravity & jumping)','Loops & \'If-Then\' logic','Variables (Score & Timers)','Creative project design'],
     curriculum:[
       'Welcome to Scratch — sprites, stage & your first animation',
       'Motion & Events — making characters move with keyboard & mouse',
@@ -256,34 +278,16 @@ export const COURSES: CourseData[] = [
       'Interactive Game Project — build your own complete game',
       'Demo Day — present and share your creation with the class',
     ],
-    badge:'Best First Step', color:'mint',
+    color:'mint',
     image:'/scratch-one.png', imagePosition:'35% 35%',
   },
   {
-    id:'2', slug:'ai-fundamentals',
-    title:'AI Fundamentals', subtitle:'Machine Learning Made Fun',
-    description:"Students uncover how AI really works by training real machine-learning models and deploying them inside Scratch. Text recognition, image classification, sound detection — they build it all from scratch.",
-    ageGroup:'10-12', tool:'AI + Scratch', sessions:8, sessionLen:'60 min', maxStudents:5, priceEUR:160,
-    skills:['How AI learns from data','Training & testing models','Image & text recognition','Ethics of AI','Real-world AI applications'],
-    curriculum:[
-      'What Is AI? — how machines learn from examples (not rules)',
-      'Collecting Training Data — what makes a good dataset',
-      'Image Recognition — train a model to identify objects & faces',
-      'Text & Sentiment — teaching AI to understand language',
-      'Sound Classification — recognising audio patterns & commands',
-      'AI + Scratch — adding your trained model to a live project',
-      'AI Ethics — bias, fairness and responsible design',
-      'AI Showcase — present your intelligent creation to the class',
-    ],
-    badge:'Most Popular', color:'teal',
-    image:'/AI-kids.png', imagePosition:'65% 40%',
-  },
-  {
-    id:'3', slug:'python-lab',
-    title:'Python Lab', subtitle:'Real Code, Real Projects',
-    description:"Teens graduate from blocks to professional Python — the language used at Google, NASA, and Netflix. They build functional apps, data projects, and games using the same tools real developers use every day.",
-    ageGroup:'13-14', tool:'Python', sessions:10, sessionLen:'60 min', maxStudents:5, priceEUR:200,
-    skills:['Variables, loops & functions','Object-oriented programming','Data structures & APIs','Debugging techniques','Independent capstone project'],
+    id:'2', slug:'python-pioneers',
+    title:'Python Pioneers', subtitle:'Real Code, Real Projects',
+    description:"Move from blocks to real text. Build your first apps and games using the language of Google and NASA in a collaborative online classroom.",
+    ageGroup:'10-12', tool:'Python', sessions:16, sessionLen:'60 min', maxStudents:5, priceEUR:159.84,
+    level:'Intermediate',
+    skills:['Fundamentals (Print, Input, Variables)','Lists and Data Collections','Defining Functions','While Loops & Game Logic','Final Project: Text-Based Adventure Game'],
     curriculum:[
       'Hello Python — variables, print() and taking user input',
       'Control Flow — if/elif/else and comparison operators',
@@ -296,32 +300,27 @@ export const COURSES: CourseData[] = [
       'Mini Game Sprint — build something fun in one session',
       'Capstone Project — design, build & demo your own app',
     ],
-    badge:'Advanced Track', color:'coral',
+    color:'coral',
     image:'/teenage-py.png', imagePosition:'60% 30%',
   },
   {
-    id:'4', slug:'claude-ai-for-kids',
-    title:'Claude AI for Kids', subtitle:'Prompt Engineering & AI Literacy',
-    description:"Kids learn to talk to AI like a pro — writing precise prompts, building their own chatbots, and understanding how tools like Claude actually work. The most future-ready skill they can learn right now.",
-    ageGroup:'10-12', tool:'Claude AI', sessions:8, sessionLen:'60 min', maxStudents:5, priceEUR:0,
-    skills:[
-      'Prompt engineering fundamentals',
-      'Build a custom chatbot with a persona',
-      'AI ethics & responsible use',
-      'Using AI as a learning & creativity tool',
-      'Critical thinking — when to trust AI',
-    ],
+    id:'3', slug:'ai-innovators',
+    title:'AI Innovators', subtitle:'Machine Learning & AI Tools',
+    description:"Step into the future. Learn to train models and use AI tools to solve problems, guided by live demonstrations and hands-on projects.",
+    ageGroup:'13+', tool:'AI Tools', sessions:10, sessionLen:'60 min', maxStudents:5, priceEUR:99.90,
+    level:'Advanced',
+    skills:['Introduction to Machine Learning','Training Visual Recognition models','Prompt Engineering & Generative AI','AI Ethics & Digital Safety','Building a simple AI Chatbot interface'],
     curriculum:[
-      'What is Claude? — how large language models think vs humans',
-      'The Art of Asking — vague vs specific prompts, the 3 elements of a great prompt',
-      'Claude as a Story Partner — co-write a story, direct characters & plot',
-      'Claude as a Study Buddy — summarise, quiz, explain. How to verify AI answers',
-      'Build Your Own Chatbot — system prompts, giving Claude a persona & rules',
-      'AI Ethics & Safety — bias, privacy, fake content, what AI should never do',
-      'Solve a Real Problem — pick a real-world challenge, design an AI-powered solution',
-      'Demo Day — present your chatbot & AI project to the class and parents',
+      'What Is AI? — how machines learn from examples (not rules)',
+      'Collecting Training Data — what makes a good dataset',
+      'Image Recognition — train a model to identify objects & faces',
+      'Text & Sentiment — teaching AI to understand language',
+      'Sound Classification — recognising audio patterns & commands',
+      'AI + Tools — connecting your trained model to a live project',
+      'AI Ethics — bias, fairness and responsible design',
+      'AI Showcase — present your intelligent creation to the class',
     ],
-    badge:'New', color:'violet',
-    image:'',
+    color:'violet',
+    image:'/AI-kids.png', imagePosition:'65% 40%',
   },
 ]

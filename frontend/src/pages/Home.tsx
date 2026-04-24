@@ -54,7 +54,7 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
 }
 
 const WHY_US_ICONS = [MonitorPlay, Users, Trophy, BookOpen, ShieldCheck, CalendarCheck]
-const PATHWAY_ICONS = [Puzzle, BrainCircuit, Code2]
+const PATHWAY_ICONS = [Puzzle, Code2, BrainCircuit]
 const HOW_IT_WORKS_ICONS = [Globe, MonitorPlay, BookOpen, Trophy]
 
 // Dark mode: pure neon  |  Light mode: deep/saturated (visible on white)
@@ -246,7 +246,7 @@ export default function HomePage({ setPage }: { setPage: (p: string) => void }) 
               <p className="text-slate-600 text-[15px] leading-relaxed">{tr.courses.subtitle}</p>
             </Reveal>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {COURSES.map((course, i) => (
               <div key={course.id} className="flex flex-col">
                 <CourseCard course={course} index={i} onBook={() => go('booking')} />
@@ -407,7 +407,7 @@ export default function HomePage({ setPage }: { setPage: (p: string) => void }) 
             <div>
               <div className="font-display font-bold text-[13px] tracking-widest uppercase text-slate-500 mb-4">{tr.footer.coursesLabel}</div>
               <ul className="space-y-2">
-                {['Scratch Creators (7–9)', 'AI Fundamentals (10–12)', 'Python Lab (13–14)'].map(l => (
+                {['Scratch Explorers (7–9)', 'Python Pioneers (10–12)', 'AI Innovators (13+)'].map(l => (
                   <li key={l}>
                     <button onClick={() => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' })}
                       className="text-slate-600 text-[14px] hover:text-brand-yellow transition-colors duration-150">{l}</button>

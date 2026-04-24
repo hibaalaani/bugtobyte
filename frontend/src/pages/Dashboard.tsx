@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Calendar, Clock, Video, LogOut, Plus, CheckCircle, User } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useBookings } from '@/hooks/useBookings'
 import toast from 'react-hot-toast'
 import ConfirmModal from '@/components/ConfirmModal'
 import { useLanguage } from '@/contexts/LanguageContext'
+import LearningJourneyMap from '@/components/LearningJourneyMap'
 
 const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
   confirmed: { bg: 'rgba(0,255,135,.1)',  color: '#00FF87' },
@@ -22,6 +23,13 @@ export default function Dashboard({ setPage }: { setPage: (p: string) => void })
   const upcoming = bookings.filter(b => b.status !== 'cancelled' && b.status !== 'completed')
   const past     = bookings.filter(b => b.status === 'completed')
   const [cancelId, setCancelId] = useState<string | null>(null)
+
+  const journeyStage = useMemo((): 0 | 1 | 2 => {
+    const titles = past.map(b => (b.course_title ?? '').toLowerCase())
+    if (titles.some(t => t.includes('ai') || t.includes('innovator'))) return 2
+    if (titles.some(t => t.includes('python') || t.includes('pioneer'))) return 1
+    return 0
+  }, [past])
 
   const handleCancel = async () => {
     if (!cancelId) return
@@ -81,6 +89,19 @@ export default function Dashboard({ setPage }: { setPage: (p: string) => void })
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Learning Journey Map */}
+        <div style={{ marginBottom: 48 }}>
+          <h2 style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:20, marginBottom:20, display:'flex', alignItems:'center', gap:10 }}>
+            Your Learning Journey
+            <span style={{ background:'rgba(255,214,10,0.12)', color:'#FFD60A', borderRadius:50, padding:'2px 10px', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase' }}>
+              Interactive
+            </span>
+          </h2>
+          <div style={{ maxWidth: 560 }}>
+            <LearningJourneyMap initialStage={journeyStage} />
+          </div>
         </div>
 
         {/* Upcoming bookings */}

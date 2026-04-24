@@ -43,7 +43,7 @@ export default function ContactPage() {
             { icon:Mail,   color:'#00FF87', label: c.emailLbl, value:'hello@bugtobyte.com'    },
             { icon:Phone,  color:'#60A5FA', label: c.whatsapp, value:'+49 (0) — via WhatsApp'  },
             { icon:MapPin, color:'#A78BFA', label: c.location, value:'Berlin, Germany 🇩🇪'      },
-            { icon:Clock,  color:'#f59e0b', label: c.hours,    value:'Mon–Sat, 9am–8pm CET'    },
+            { icon:Clock,  color:'#f59e0b', label: c.hours,    value:'Mon–Sat, 9am–5pm CET'    },
           ].map(({ icon:Icon, color, label, value }) => (
             <motion.div key={label} whileHover={{ x:4 }} style={{ display:'flex', gap:18, alignItems:'center', padding:'20px 0', borderBottom:'1px solid rgba(255,255,255,.05)' }}>
               <div style={{ width:48, height:48, borderRadius:10, background:`${color}14`, border:`1px solid ${color}28`, display:'grid', placeItems:'center', flexShrink:0 }}>
