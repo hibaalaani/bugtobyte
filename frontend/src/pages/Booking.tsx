@@ -123,7 +123,7 @@ export default function BookingPage({ setPage }: { setPage: (p: string) => void 
 
   // ── Confirm booking ──────────────────────────────────────────
   const handleConfirm = async () => {
-    if (!user || !session) { toast.error(d.loginFirst); setPage('login'); return }
+    if (!user || !session) { toast.error(d.loginFirst); sessionStorage.setItem('returnTo', 'booking'); setPage('login'); return }
     if (!selDate || !selTime || !selCourse) return
     setLoading(true)
 
@@ -498,7 +498,7 @@ export default function BookingPage({ setPage }: { setPage: (p: string) => void 
                 {!user && (
                   <div style={{ background:'rgba(251,191,36,.08)', border:'1px solid rgba(251,191,36,.3)', borderRadius:10, padding:16, marginBottom:20 }}>
                     <p style={{ color:'#fbbf24', fontSize:14, fontFamily:'IBM Plex Sans, sans-serif' }}>{d.loginWarning}</p>
-                    <button onClick={() => setPage('login')} style={{ marginTop:10, background:'rgba(251,191,36,.15)', border:'1px solid rgba(251,191,36,.3)', borderRadius:6, padding:'8px 16px', color:'#fbbf24', cursor:'pointer', fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:13 }}>{d.signInBtn}</button>
+                    <button onClick={() => { sessionStorage.setItem('returnTo', 'booking'); setPage('login') }} style={{ marginTop:10, background:'rgba(251,191,36,.15)', border:'1px solid rgba(251,191,36,.3)', borderRadius:6, padding:'8px 16px', color:'#fbbf24', cursor:'pointer', fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:13 }}>{d.signInBtn}</button>
                   </div>
                 )}
 

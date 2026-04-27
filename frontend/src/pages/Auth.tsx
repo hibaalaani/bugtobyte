@@ -33,7 +33,9 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
         return
       }
       toast.success('Welcome back!')
-      setPage('dashboard')
+      const returnTo = sessionStorage.getItem('returnTo') || 'dashboard'
+      sessionStorage.removeItem('returnTo')
+      setPage(returnTo)
     }
 
     if (mode === 'signup') {

@@ -1,6 +1,6 @@
 
-// ─── REPLACE THIS WITH YOUR REAL WHATSAPP NUMBER (digits only, no + or spaces) ───
-const WA_NUMBER = '004917623168309'   // e.g. 4915712345678
+
+const WA_NUMBER = '4917623168309'   // digits only, no + or 00 prefix
 // ─────────────────────────────────────────────────────────────────────────────────
 
 const WA_TEXT = encodeURIComponent(

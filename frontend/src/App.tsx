@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
 import toast from 'react-hot-toast'
-import { AuthProvider } from '@/contexts/AuthContext'
+import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
 import Navbar      from '@/components/Navbar'
@@ -28,6 +28,17 @@ function AppInner() {
   const [page, setPage] = useState('home')
   const { isRTL } = useLanguage()
   const { isDark } = useTheme()
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      const returnTo = sessionStorage.getItem('returnTo')
+      if (returnTo) {
+        sessionStorage.removeItem('returnTo')
+        setPage(returnTo)
+      }
+    }
+  }, [user])
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
