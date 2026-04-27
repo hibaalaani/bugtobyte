@@ -172,7 +172,7 @@ export default function Navbar({ page, setPage }: { page: string; setPage: (p: s
               ))}
               <div style={{ padding: '14px 4px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 15 }}>
-                  {isDark ? 'Dark mode' : 'Light mode'}
+                  {isDark ? tr.nav.darkMode : tr.nav.lightMode}
                 </span>
                 <button onClick={toggleTheme}
                   style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '6px 8px', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>

@@ -7,6 +7,7 @@ import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
 import Navbar      from '@/components/Navbar'
 import Trial from '@/pages/Trial'
+import TrialAr from '@/pages/TrialAr'
 import HomePage    from '@/pages/Home'
 import AboutPage   from '@/pages/About'
 import ContactPage from '@/pages/Contact'
@@ -15,6 +16,7 @@ import AuthPage    from '@/pages/Auth'
 import Dashboard      from '@/pages/Dashboard'
 import ResetPassword  from '@/pages/ResetPassword'
 import TermsPage      from '@/pages/Terms'
+import CoursePage     from '@/pages/CoursePage'
 
 const TRANSITION = {
   initial:  { opacity: 0, y: 14 },
@@ -22,7 +24,7 @@ const TRANSITION = {
   exit:     { opacity: 0, y: -8, transition: { duration: 0.22 } },
 }
 
-const HIDE_NAV = ['login', 'signup', 'reset-password', 'trial']
+const HIDE_NAV = ['login', 'signup', 'reset-password', 'trial', 'trial-ar']
 
 function AppInner() {
   const [page, setPage] = useState('home')
@@ -42,7 +44,8 @@ function AppInner() {
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
-    if (p.get('page')    === 'trial') setPage('trial')
+    if (p.get('page')    === 'trial')    setPage('trial')
+    if (p.get('page')    === 'trial-ar') setPage('trial-ar')
     if (p.get('reset')   === 'true') setPage('reset-password')
     if (p.get('payment') === 'success') {
       setPage('dashboard')
@@ -60,12 +63,14 @@ function AppInner() {
       case 'about':     return <AboutPage   setPage={setPage} />
       case 'contact':   return <ContactPage />
       case 'trial':      return <Trial      setPage={setPage} />
+      case 'trial-ar':   return <TrialAr    setPage={setPage} />
       case 'booking':   return <BookingPage setPage={setPage} />
       case 'login':     return <AuthPage    setPage={setPage} initialMode="login"  />
       case 'signup':    return <AuthPage    setPage={setPage} initialMode="signup" />
       case 'dashboard':      return <Dashboard      setPage={setPage} />
       case 'reset-password': return <ResetPassword  setPage={setPage} />
       case 'terms':          return <TermsPage      setPage={setPage} />
+      case 'course':         return <CoursePage     setPage={setPage} />
       default:               return <HomePage       setPage={setPage} />
     }
   }

@@ -96,9 +96,9 @@ export default function Dashboard({ setPage }: { setPage: (p: string) => void })
         {/* Learning Journey Map */}
         <div style={{ marginBottom: 48 }}>
           <h2 style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:20, marginBottom:20, display:'flex', alignItems:'center', gap:10 }}>
-            Your Learning Journey
+            {d.learningJourney}
             <span style={{ background:'rgba(255,214,10,0.12)', color:'#FFD60A', borderRadius:50, padding:'2px 10px', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase' }}>
-              Interactive
+              {d.interactive}
             </span>
           </h2>
           <div style={{ maxWidth: 560 }}>

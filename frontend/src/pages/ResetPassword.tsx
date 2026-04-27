@@ -3,26 +3,27 @@ import { motion } from 'framer-motion'
 import { Lock, Eye, EyeOff, ArrowRight, Mail } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import toast from 'react-hot-toast'
 
 export default function ResetPassword({ setPage }: { setPage: (p: string) => void }) {
   const { session, loading } = useAuth()
-  const [password, setPassword] = useState('')
-  const [confirm,  setConfirm]  = useState('')
-  const [showPass, setShowPass] = useState(false)
+  const { tr } = useLanguage()
+  const r = tr.resetPw
+  const [password,   setPassword]   = useState('')
+  const [confirm,    setConfirm]    = useState('')
+  const [showPass,   setShowPass]   = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password.length < 8) { toast.error('Password must be at least 8 characters'); return }
-    if (password !== confirm)  { toast.error('Passwords do not match'); return }
-
+    if (password.length < 8) { toast.error(r.minChars); return }
+    if (password !== confirm)  { toast.error(r.noMatch); return }
     setSubmitting(true)
     const { error } = await supabase.auth.updateUser({ password })
     setSubmitting(false)
-
     if (error) { toast.error(error.message); return }
-    toast.success('Password updated! You are now signed in.')
+    toast.success(r.updated)
     setPage('dashboard')
   }
 
@@ -33,10 +34,6 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
     fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15, outline: 'none',
   }
 
-  // Determine what to show based on AuthContext state
-  // loading = Supabase is still processing the recovery token from the URL hash
-  // session  = token was valid, user is authenticated and can update password
-  // neither  = link is expired or invalid
   const status = loading ? 'waiting' : session ? 'ready' : 'expired'
 
   return (
@@ -51,12 +48,12 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
             Bug<span style={{ color: '#00FF87' }}>To</span>Byte
           </div>
           <h1 style={{ fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 28, color: '#F0EFE7', marginBottom: 8 }}>
-            {status === 'expired' ? 'Link Expired' : 'Set New Password'}
+            {status === 'expired' ? r.linkExpired : r.setNew}
           </h1>
           <p style={{ color: 'rgba(240,239,231,.5)', fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15 }}>
-            {status === 'waiting' && 'Verifying your reset link…'}
-            {status === 'ready'   && 'Choose a strong password for your account'}
-            {status === 'expired' && 'This link has expired or already been used.'}
+            {status === 'waiting' && r.verifying}
+            {status === 'ready'   && r.chooseStrong}
+            {status === 'expired' && r.expiredDesc}
           </p>
         </div>
 
@@ -75,10 +72,10 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
                 <Mail size={24} color="#fbbf24" />
               </div>
               <p style={{ color: 'rgba(240,239,231,.55)', fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
-                Request a new link from the login page.
+                {r.requestNew}
               </p>
               <button onClick={() => setPage('login')} style={{ width: '100%', background: 'linear-gradient(135deg,#00FF87,#00D4AA)', color: '#050A12', border: 'none', borderRadius: 8, padding: '14px', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
-                Back to Login
+                {r.backToLogin}
               </button>
             </div>
           )}
@@ -86,10 +83,10 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
           {status === 'ready' && (
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: 18 }}>
-                <label style={{ display: 'block', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>New Password</label>
+                <label style={{ display: 'block', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>{r.newPassword}</label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,239,231,.35)' }} />
-                  <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 8 characters" required style={inputStyle}
+                  <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder={r.minPh} required style={inputStyle}
                     onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,255,135,.5)'}
                     onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,.1)'} />
                   <button type="button" onClick={() => setShowPass(s => !s)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(240,239,231,.4)', cursor: 'pointer', padding: 0 }}>
@@ -99,17 +96,17 @@ export default function ResetPassword({ setPage }: { setPage: (p: string) => voi
               </div>
 
               <div style={{ marginBottom: 28 }}>
-                <label style={{ display: 'block', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>Confirm Password</label>
+                <label style={{ display: 'block', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 600, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(240,239,231,.6)', marginBottom: 8, textTransform: 'uppercase' }}>{r.confirmPassword}</label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,239,231,.35)' }} />
-                  <input type={showPass ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Repeat your password" required style={{ ...inputStyle, paddingRight: 14 }}
+                  <input type={showPass ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} placeholder={r.repeatPh} required style={{ ...inputStyle, paddingRight: 14 }}
                     onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,255,135,.5)'}
                     onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,.1)'} />
                 </div>
               </div>
 
               <button type="submit" disabled={submitting} style={{ width: '100%', background: 'linear-gradient(135deg,#00FF87,#00D4AA)', color: '#050A12', border: 'none', borderRadius: 8, padding: '14px', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: submitting ? 0.6 : 1 }}>
-                {submitting ? 'Updating...' : 'Update Password'}
+                {submitting ? r.updating : r.updateBtn}
                 {!submitting && <ArrowRight size={16} />}
               </button>
             </form>

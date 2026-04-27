@@ -249,7 +249,7 @@ export default function HomePage({ setPage }: { setPage: (p: string) => void }) 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {COURSES.map((course, i) => (
               <div key={course.id} className="flex flex-col">
-                <CourseCard course={course} index={i} onBook={() => go('booking')} />
+                <CourseCard course={course} index={i} onBook={(c) => { sessionStorage.setItem('selectedCourse', c.slug); go('course') }} />
               </div>
             ))}
           </div>

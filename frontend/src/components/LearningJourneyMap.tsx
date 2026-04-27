@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Puzzle, Code2, Bot, Star } from 'lucide-react'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // ── Course totals (must match COURSES data) ───────────────────
 const TOTALS = { scratch: 12, python: 16, ai: 10 } as const
@@ -99,6 +100,14 @@ export default function LearningJourneyMap({
 }: {
   sessions?: { scratch: number; python: number; ai: number }
 }) {
+  const { tr } = useLanguage()
+  const lm = tr.learningMap
+
+  const translatedMilestones = useMemo(
+    () => MILESTONES.map((ms, i) => ({ ...ms, label: lm.milestones[i], ages: lm.ages[i], badge: lm.levels[i] })),
+    [lm],
+  )
+
   const [bursting, setBursting] = useState(false)
   const mountedRef = useRef(false)
 
@@ -123,7 +132,7 @@ export default function LearningJourneyMap({
     total: [TOTALS.scratch, TOTALS.python, TOTALS.ai][activeStage],
   }
 
-  const m = MILESTONES[activeStage]
+  const m = translatedMilestones[activeStage]
 
   // Burst when a course is completed (skip on first mount)
   useEffect(() => {
@@ -171,13 +180,13 @@ export default function LearningJourneyMap({
         <div className="inline-flex items-center gap-1.5 mb-2 px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase"
           style={{ background: 'rgba(255,214,10,0.12)', color: '#FFD60A', border: '1px solid rgba(255,214,10,0.28)' }}>
           <Star size={9} fill="#FFD60A" style={{ color: '#FFD60A' }} />
-          Learning Journey Map
+          {lm.mapTitle}
         </div>
         <h3 className="font-bold text-white text-lg leading-tight tracking-tight">
-          Adventure in Progress
+          {lm.adventure}
         </h3>
         <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          {totalDone} of {TOTAL_SESSIONS} sessions completed
+          {totalDone} {lm.of} {TOTAL_SESSIONS} {lm.sessionsCompleted}
         </p>
       </div>
 
@@ -192,7 +201,7 @@ export default function LearningJourneyMap({
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             style={{
               height: '100%',
-              background: `linear-gradient(90deg, ${MILESTONES[0].color}, ${m.color})`,
+              background: `linear-gradient(90deg, ${translatedMilestones[0].color}, ${m.color})`,
               borderRadius: 99,
             }}
           />
@@ -242,7 +251,7 @@ export default function LearningJourneyMap({
         </motion.div>
 
         {/* ── Milestone nodes ── */}
-        {MILESTONES.map((ms, i) => {
+        {translatedMilestones.map((ms, i) => {
           const isCompleted = activeStage > i
           const isCurrent   = activeStage === i
           const isUnlocked  = isCompleted || isCurrent
@@ -323,7 +332,7 @@ export default function LearningJourneyMap({
           <div className="flex-1 min-w-0">
             <div className="font-bold text-sm text-white leading-tight">{m.label}</div>
             <div className="text-[11px] mt-0.5 font-medium" style={{ color: m.color }}>
-              {currentProgress.done} of {currentProgress.total} sessions · {m.badge}
+              {currentProgress.done} {lm.of} {currentProgress.total} {lm.sessionsCompleted} · {m.badge}
             </div>
           </div>
 
@@ -349,7 +358,7 @@ export default function LearningJourneyMap({
       <div className="mt-5 flex items-center gap-3">
         <span className="text-[10px] font-bold tracking-widest uppercase"
           style={{ color: 'rgba(255,255,255,0.3)', minWidth: 48 }}>
-          Progress
+          {lm.progress}
         </span>
         <div className="flex-1 rounded-full overflow-hidden" style={{ height: 5, background: 'rgba(255,255,255,0.06)' }}>
           <motion.div
@@ -358,7 +367,7 @@ export default function LearningJourneyMap({
             style={{
               height: '100%',
               borderRadius: 99,
-              background: `linear-gradient(90deg, ${MILESTONES[0].color}, ${m.color})`,
+              background: `linear-gradient(90deg, ${translatedMilestones[0].color}, ${m.color})`,
               boxShadow: `0 0 10px ${m.glow}`,
             }}
           />
