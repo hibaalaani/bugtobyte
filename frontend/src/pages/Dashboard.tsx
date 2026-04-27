@@ -24,11 +24,13 @@ export default function Dashboard({ setPage }: { setPage: (p: string) => void })
   const past     = bookings.filter(b => b.status === 'completed')
   const [cancelId, setCancelId] = useState<string | null>(null)
 
-  const journeyStage = useMemo((): 0 | 1 | 2 => {
-    const titles = past.map(b => (b.course_title ?? '').toLowerCase())
-    if (titles.some(t => t.includes('ai') || t.includes('innovator'))) return 2
-    if (titles.some(t => t.includes('python') || t.includes('pioneer'))) return 1
-    return 0
+  const sessionCounts = useMemo(() => {
+    const title = (b: { course_title?: string | null }) => (b.course_title ?? '').toLowerCase()
+    return {
+      scratch: past.filter(b => title(b).includes('scratch') || title(b).includes('explorer')).length,
+      python:  past.filter(b => title(b).includes('python')  || title(b).includes('pioneer')).length,
+      ai:      past.filter(b => title(b).includes('ai')      || title(b).includes('innovator')).length,
+    }
   }, [past])
 
   const handleCancel = async () => {
@@ -100,7 +102,7 @@ export default function Dashboard({ setPage }: { setPage: (p: string) => void })
             </span>
           </h2>
           <div style={{ maxWidth: 560 }}>
-            <LearningJourneyMap initialStage={journeyStage} />
+            <LearningJourneyMap sessions={sessionCounts} />
           </div>
         </div>
 
