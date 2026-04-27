@@ -6,6 +6,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
 import Navbar      from '@/components/Navbar'
+import Trial from '@/pages/Trial'
 import HomePage    from '@/pages/Home'
 import AboutPage   from '@/pages/About'
 import ContactPage from '@/pages/Contact'
@@ -21,7 +22,7 @@ const TRANSITION = {
   exit:     { opacity: 0, y: -8, transition: { duration: 0.22 } },
 }
 
-const HIDE_NAV = ['login', 'signup', 'reset-password']
+const HIDE_NAV = ['login', 'signup', 'reset-password', 'trial']
 
 function AppInner() {
   const [page, setPage] = useState('home')
@@ -30,6 +31,7 @@ function AppInner() {
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
+    if (p.get('page')    === 'trial') setPage('trial')
     if (p.get('reset')   === 'true') setPage('reset-password')
     if (p.get('payment') === 'success') {
       setPage('dashboard')
@@ -46,6 +48,7 @@ function AppInner() {
       case 'home':      return <HomePage    setPage={setPage} />
       case 'about':     return <AboutPage   setPage={setPage} />
       case 'contact':   return <ContactPage />
+      case 'trial':      return <Trial      setPage={setPage} />
       case 'booking':   return <BookingPage setPage={setPage} />
       case 'login':     return <AuthPage    setPage={setPage} initialMode="login"  />
       case 'signup':    return <AuthPage    setPage={setPage} initialMode="signup" />
