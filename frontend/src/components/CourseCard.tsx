@@ -43,7 +43,7 @@ const LEVEL_COLOR = {
   Advanced:     { bg: 'rgba(123,0,212,0.10)',  text: '#7B00D4', border: 'rgba(123,0,212,0.28)' },
 }
 
-function downloadSyllabus(course: CourseData, td: { subtitle: string; skills: string[]; curriculum: string[] }) {
+function downloadSyllabus(course: CourseData, td: { subtitle: string; skills: readonly string[]; curriculum: readonly string[] }) {
   if (course.syllabusUrl) {
     const a = document.createElement('a')
     a.href = course.syllabusUrl
