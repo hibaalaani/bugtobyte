@@ -111,6 +111,32 @@ export default function BookingPage({ setPage }: { setPage: (p: string) => void 
 
   const isFreeDemo = selCourse?.id === 'free-demo'
 
+  // Returns true if a time slot (e.g. "09:00") has already passed today (Berlin time)
+  const isPastTime = (timeStr: string): boolean => {
+    if (!selDate) return false
+    if (format(selDate, 'yyyy-MM-dd') !== format(new Date(), 'yyyy-MM-dd')) return false
+    const berlinHour = parseInt(
+      new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false }).format(new Date()),
+      10
+    )
+    return parseInt(timeStr.split(':')[0], 10) <= berlinHour
+  }
+
+  // Has this parent already used their free demo?
+  const [hasUsedFreeDemo, setHasUsedFreeDemo] = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    supabase
+      .from('appointments')
+      .select('id')
+      .eq('parent_id', user.id)
+      .is('course_id', null)
+      .neq('status', 'cancelled')
+      .limit(1)
+      .then(({ data }) => setHasUsedFreeDemo((data ?? []).length > 0))
+  }, [user])
+
   // Fetch paid courses
   useEffect(() => {
     supabase
@@ -277,36 +303,61 @@ export default function BookingPage({ setPage }: { setPage: (p: string) => void 
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-24 }} transition={{ duration:.5 }}>
 
-              {/* Free demo card — always first */}
+              {/* Free demo card — shown only if parent hasn't used it yet */}
               <div style={{ marginBottom:24 }}>
                 <p style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:12, letterSpacing:'0.1em', color:'rgba(240,239,231,.4)', textTransform:'uppercase', marginBottom:14 }}>{d.tryFree}</p>
-                <motion.button
-                  whileHover={{ y:-3 }}
-                  whileTap={{ scale:.99 }}
-                  onClick={() => setSelCourse(FREE_DEMO)}
-                  style={{
-                    width:'100%', textAlign:'left', cursor:'pointer',
-                    background: isFreeDemo ? 'rgba(0,255,135,.08)' : 'rgba(255,255,255,.03)',
-                    border: isFreeDemo ? '1.5px solid rgba(0,255,135,.5)' : '1px solid rgba(255,255,255,.08)',
-                    borderRadius:12, padding:'24px 28px', transition:'all .2s',
+
+                {hasUsedFreeDemo ? (
+                  <div style={{
+                    width:'100%', textAlign:'left',
+                    background:'rgba(255,255,255,.02)',
+                    border:'1px solid rgba(255,255,255,.06)',
+                    borderRadius:12, padding:'24px 28px',
                     display:'flex', alignItems:'center', gap:20, flexWrap:'wrap',
-                  }}
-                >
-                  <div style={{ width:52, height:52, borderRadius:12, background:'rgba(0,255,135,.12)', border:'1px solid rgba(0,255,135,.25)', display:'grid', placeItems:'center', flexShrink:0 }}>
-                    <Star size={24} color="#00FF87" />
-                  </div>
-                  <div style={{ flex:1 }}>
-                    <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:18, color:'#F0EFE7', marginBottom:6 }}>{d.freeDemoTitle}</div>
-                    <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontSize:14, color:'rgba(240,239,231,.5)', lineHeight:1.6 }}>
-                      {d.freeDemoDesc}
+                    opacity: 0.55,
+                  }}>
+                    <div style={{ width:52, height:52, borderRadius:12, background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.1)', display:'grid', placeItems:'center', flexShrink:0 }}>
+                      <CheckCircle size={24} color="rgba(0,255,135,.5)" />
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:16, color:'rgba(240,239,231,.6)', marginBottom:4 }}>{d.freeDemoTitle}</div>
+                      <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontSize:13, color:'rgba(240,239,231,.35)', lineHeight:1.6 }}>
+                        {d.freeDemoUsed}
+                      </div>
+                    </div>
+                    <div style={{ textAlign:'right', flexShrink:0 }}>
+                      <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:13, color:'rgba(0,255,135,.45)', background:'rgba(0,255,135,.07)', border:'1px solid rgba(0,255,135,.15)', borderRadius:6, padding:'4px 12px' }}>Used</div>
                     </div>
                   </div>
-                  <div style={{ textAlign:'right', flexShrink:0 }}>
-                    <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:800, fontSize:24, color:'#00FF87' }}>{d.free}</div>
-                    <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontSize:12, color:'rgba(240,239,231,.4)', marginTop:2 }}>{d.noPayment}</div>
-                  </div>
-                  {isFreeDemo && <CheckCircle size={20} color="#00FF87" style={{ flexShrink:0 }} />}
-                </motion.button>
+                ) : (
+                  <motion.button
+                    whileHover={{ y:-3 }}
+                    whileTap={{ scale:.99 }}
+                    onClick={() => setSelCourse(FREE_DEMO)}
+                    style={{
+                      width:'100%', textAlign:'left', cursor:'pointer',
+                      background: isFreeDemo ? 'rgba(0,255,135,.08)' : 'rgba(255,255,255,.03)',
+                      border: isFreeDemo ? '1.5px solid rgba(0,255,135,.5)' : '1px solid rgba(255,255,255,.08)',
+                      borderRadius:12, padding:'24px 28px', transition:'all .2s',
+                      display:'flex', alignItems:'center', gap:20, flexWrap:'wrap',
+                    }}
+                  >
+                    <div style={{ width:52, height:52, borderRadius:12, background:'rgba(0,255,135,.12)', border:'1px solid rgba(0,255,135,.25)', display:'grid', placeItems:'center', flexShrink:0 }}>
+                      <Star size={24} color="#00FF87" />
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:18, color:'#F0EFE7', marginBottom:6 }}>{d.freeDemoTitle}</div>
+                      <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontSize:14, color:'rgba(240,239,231,.5)', lineHeight:1.6 }}>
+                        {d.freeDemoDesc}
+                      </div>
+                    </div>
+                    <div style={{ textAlign:'right', flexShrink:0 }}>
+                      <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:800, fontSize:24, color:'#00FF87' }}>{d.free}</div>
+                      <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontSize:12, color:'rgba(240,239,231,.4)', marginTop:2 }}>{d.noPayment}</div>
+                    </div>
+                    {isFreeDemo && <CheckCircle size={20} color="#00FF87" style={{ flexShrink:0 }} />}
+                  </motion.button>
+                )}
               </div>
 
               {/* Paid courses */}
@@ -411,8 +462,10 @@ export default function BookingPage({ setPage }: { setPage: (p: string) => void 
                     </div>
                     <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                       {TIME_SLOTS.map(t => {
-                        const taken = bookedSlots.includes(t)
-                        const isSel = selTime === t
+                        const booked  = bookedSlots.includes(t)
+                        const isPast  = isPastTime(t)
+                        const taken   = booked || isPast
+                        const isSel   = selTime === t
                         return (
                           <motion.button
                             key={t}
@@ -421,19 +474,20 @@ export default function BookingPage({ setPage }: { setPage: (p: string) => void 
                             whileTap={!taken ? { scale:.97 } : {}}
                             onClick={() => !taken && setSelTime(t)}
                             style={{
-                              background: isSel ? 'linear-gradient(135deg,#00FF87,#00D4AA)' : taken ? 'rgba(248,113,113,.07)' : 'rgba(255,255,255,.05)',
-                              border: isSel ? 'none' : taken ? '1px solid rgba(248,113,113,.2)' : '1px solid rgba(255,255,255,.1)',
+                              background: isSel ? 'linear-gradient(135deg,#00FF87,#00D4AA)' : booked ? 'rgba(248,113,113,.07)' : isPast ? 'rgba(255,255,255,.02)' : 'rgba(255,255,255,.05)',
+                              border: isSel ? 'none' : booked ? '1px solid rgba(248,113,113,.2)' : isPast ? '1px solid rgba(255,255,255,.05)' : '1px solid rgba(255,255,255,.1)',
                               borderRadius:8, padding:'13px 0',
-                              color: isSel ? '#050A12' : taken ? 'rgba(248,113,113,.5)' : '#F0EFE7',
+                              color: isSel ? '#050A12' : booked ? 'rgba(248,113,113,.5)' : isPast ? 'rgba(240,239,231,.2)' : '#F0EFE7',
                               cursor: taken ? 'not-allowed' : 'pointer',
                               fontFamily:'IBM Plex Sans, sans-serif', fontWeight: isSel ? 700 : 500, fontSize:14, transition:'all .15s',
-                              textDecoration: taken ? 'line-through' : 'none',
+                              textDecoration: booked ? 'line-through' : 'none',
                               textDecorationColor: 'rgba(248,113,113,.6)',
                               textDecorationThickness: 2,
                             }}
                           >
                             {t}
-                            {taken && <div style={{ fontSize:9, color:'rgba(248,113,113,.45)', marginTop:2, textDecoration:'none' }}>{d.taken}</div>}
+                            {booked && <div style={{ fontSize:9, color:'rgba(248,113,113,.45)', marginTop:2, textDecoration:'none' }}>{d.taken}</div>}
+                            {isPast  && <div style={{ fontSize:9, color:'rgba(240,239,231,.25)', marginTop:2 }}>{d.pastSlot}</div>}
                           </motion.button>
                         )
                       })}

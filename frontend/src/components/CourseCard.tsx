@@ -4,28 +4,29 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Puzzle, Brain, Code2, Clock, Users,
-  ArrowRight, Zap, CheckCircle2, ChevronDown, Sparkles,
+  ArrowRight, Zap, CheckCircle2, ChevronDown, Sparkles, Download,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────
 export interface CourseData {
-  id:          string
-  slug:        string
-  title:       string
-  subtitle:    string
-  description: string
-  ageGroup:    '7-9' | '10-12' | '13+'
-  tool:        'Scratch' | 'AI Tools' | 'Python'
-  sessions:    number
-  sessionLen:  string
-  maxStudents: number
-  priceEUR:    number
-  skills:      string[]
-  curriculum:  string[]
-  level:       'Beginner' | 'Intermediate' | 'Advanced'
-  color:       'mint' | 'teal' | 'coral' | 'violet'
-  image:       string
+  id:            string
+  slug:          string
+  title:         string
+  subtitle:      string
+  description:   string
+  ageGroup:      '7-9' | '10-12' | '13+'
+  tool:          'Scratch' | 'AI Tools' | 'Python'
+  sessions:      number
+  sessionLen:    string
+  maxStudents:   number
+  priceEUR:      number
+  skills:        string[]
+  curriculum:    string[]
+  level:         'Beginner' | 'Intermediate' | 'Advanced'
+  color:         'mint' | 'teal' | 'coral' | 'violet'
+  image:         string
   imagePosition?: string
+  syllabusUrl?:  string  // set to '/syllabi/filename.pdf' once you have a real PDF
 }
 
 interface CourseCardProps {
@@ -40,6 +41,98 @@ const LEVEL_COLOR = {
   Beginner:     { bg: 'rgba(14,155,100,0.12)', text: '#0E9B64', border: 'rgba(14,155,100,0.30)' },
   Intermediate: { bg: 'rgba(201,48,48,0.10)',  text: '#C93030', border: 'rgba(201,48,48,0.28)' },
   Advanced:     { bg: 'rgba(123,0,212,0.10)',  text: '#7B00D4', border: 'rgba(123,0,212,0.28)' },
+}
+
+function downloadSyllabus(course: CourseData, td: { subtitle: string; skills: string[]; curriculum: string[] }) {
+  if (course.syllabusUrl) {
+    const a = document.createElement('a')
+    a.href = course.syllabusUrl
+    a.download = `${course.slug}-syllabus.pdf`
+    a.click()
+    return
+  }
+
+  const accentMap: Record<string, string> = { mint: '#0E9B64', teal: '#0D8A83', coral: '#C93030', violet: '#7B00D4' }
+  const accent = accentMap[course.color] ?? '#0E9B64'
+
+  const weeks = course.curriculum.map((item, i) => `
+    <tr style="border-bottom:1px solid #eee">
+      <td style="padding:10px 14px;font-weight:700;color:${accent};white-space:nowrap;font-size:12px">Week ${i + 1}</td>
+      <td style="padding:10px 14px;font-size:14px;color:#1a1a2e">${item}</td>
+    </tr>`).join('')
+
+  const skills = td.skills.map(s => `<li style="margin-bottom:6px;font-size:14px;color:#333">${s}</li>`).join('')
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>${course.title} — Course Syllabus | BugToByte Academy</title>
+<style>
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f7f8fc;color:#1a1a2e}
+  .wrap{max-width:720px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10)}
+  .header{background:${accent};padding:36px 40px 28px;color:#fff}
+  .logo{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.85;margin-bottom:10px}
+  h1{margin:0 0 6px;font-size:28px;line-height:1.2}
+  .meta{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap}
+  .badge{background:rgba(255,255,255,.2);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600}
+  .body{padding:36px 40px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${accent};margin:0 0 12px;border-bottom:2px solid ${accent}22;padding-bottom:6px}
+  p{font-size:14px;line-height:1.75;color:#444;margin:0 0 28px}
+  ul{margin:0 0 28px;padding-left:20px}
+  table{width:100%;border-collapse:collapse;margin-bottom:32px;background:#fafafa;border-radius:8px;overflow:hidden}
+  .footer{background:#f0f2ff;padding:20px 40px;font-size:12px;color:#666;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap}
+  @media print{body{background:#fff}.wrap{box-shadow:none;margin:0;border-radius:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">BugToByte Academy — Course Syllabus</div>
+    <h1>${course.title}</h1>
+    <div style="opacity:.9;font-size:15px;margin-top:4px">${td.subtitle}</div>
+    <div class="meta">
+      <span class="badge">Ages ${course.ageGroup}</span>
+      <span class="badge">${course.sessions} sessions · ${course.sessionLen}</span>
+      <span class="badge">Max ${course.maxStudents} students</span>
+      <span class="badge">${course.level}</span>
+      <span class="badge">€${(course.sessions * 9.99).toFixed(2)}</span>
+    </div>
+  </div>
+  <div class="body">
+    <h2>About This Course</h2>
+    <p>${course.description}</p>
+
+    <h2>What Your Child Will Learn</h2>
+    <ul>${skills}</ul>
+
+    <h2>Week-by-Week Curriculum</h2>
+    <table>
+      <tbody>${weeks}</tbody>
+    </table>
+
+    <h2>Enrol</h2>
+    <p>Book a free 30-minute demo session at <strong>bugtobyte.com</strong> — no commitment required.<br/>
+    Questions? Email us at <strong>hello@bugtobyte.com</strong></p>
+  </div>
+  <div class="footer">
+    <span>© ${new Date().getFullYear()} BugToByte Academy</span>
+    <span>hello@bugtobyte.com · bugtobyte.com</span>
+  </div>
+</div>
+</body>
+</html>`
+
+  const blob = new Blob([html], { type: 'text/html' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href     = url
+  a.download = `${course.slug}-syllabus.html`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
 }
 
 export default function CourseCard({ course, index, onBook }: CourseCardProps) {
@@ -247,12 +340,22 @@ export default function CourseCard({ course, index, onBook }: CourseCardProps) {
         </div>
         <motion.button onClick={() => onBook?.(course)}
           whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.97 }}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-display font-bold text-[15px] text-white"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-display font-bold text-[15px] text-white mb-3"
           style={{
             background: `linear-gradient(135deg, ${c.text} 0%, ${c.text}CC 100%)`,
             boxShadow: `0 6px 28px ${c.text}55, 0 2px 8px ${c.text}33`,
           }}>
           {tr.courses.bookNow} <ArrowRight size={16} strokeWidth={2.5} />
+        </motion.button>
+        <motion.button onClick={() => downloadSyllabus(course, td)}
+          whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-display font-semibold text-[13px]"
+          style={{
+            background: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9',
+            border: `1px solid ${c.border}`,
+            color: c.text,
+          }}>
+          <Download size={14} /> {tr.courses.downloadSyllabus}
         </motion.button>
       </div>
     </motion.div>

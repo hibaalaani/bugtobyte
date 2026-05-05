@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight, Play, ChevronDown,
@@ -35,23 +35,6 @@ function Reveal({ children, delay = 0, className = '', from = 'bottom' }: {
   )
 }
 
-function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const ref    = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true })
-  const [val, setVal] = useState(0)
-  useEffect(() => {
-    if (!inView) return
-    let current = 0
-    const step = to / 55
-    const id   = setInterval(() => {
-      current += step
-      if (current >= to) { setVal(to); clearInterval(id) }
-      else setVal(Math.floor(current))
-    }, 18)
-    return () => clearInterval(id)
-  }, [inView, to])
-  return <span ref={ref}>{val.toLocaleString()}{suffix}</span>
-}
 
 const WHY_US_ICONS = [MonitorPlay, Users, Trophy, BookOpen, ShieldCheck, CalendarCheck]
 const PATHWAY_ICONS = [Puzzle, Code2, BrainCircuit]
@@ -63,13 +46,6 @@ const WHY_US_COLORS_LIGHT = ['#B45309', '#0070A8', '#06875A', '#C90050', '#7B00D
 // Pathway: Neon Green (Scratch) · Electric Cyan (AI) · Electric Yellow (Python)
 const PATHWAY_COLORS_DARK  = ['#00E676', '#00E5FF', '#FFD60A']
 const PATHWAY_COLORS_LIGHT = ['#059669', '#0891B2', '#D97706']
-
-const STATS_VALUES = [
-  { value: 1200, suffix: '+' },
-  { value: 98,   suffix: '%' },
-  { value: 3,    suffix: ''  },
-  { value: 4.9,  suffix: '★' },
-]
 
 const TESTIMONIALS = [
   { initials: 'SM', name: 'Sarah M.',  child: 'Liam, age 11',  text: "Liam finished the AI Fundamentals course and immediately started explaining machine learning to his grandparents. I couldn't believe the depth of what he understood in just 8 weeks.", stars: 5, color: '#00E5FF' },
@@ -155,13 +131,13 @@ export default function HomePage({ setPage }: { setPage: (p: string) => void }) 
       {/* ══ STATS ═════════════════════════════════════════════ */}
       <div style={{ borderTop: '1px solid var(--divider)', borderBottom: '1px solid var(--divider)', background: 'var(--bg-stats)', backdropFilter: 'blur(12px)' }}>
         <div className="max-w-5xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {STATS_VALUES.map((s, i) => (
+          {tr.stats.map((s, i) => (
             <Reveal key={i} delay={i * 0.08}>
               <div className="text-center">
-                <div className="font-display font-extrabold mb-1" style={{ fontSize: 'clamp(32px,4vw,46px)', color: isDark ? '#FFD60A' : '#B45309', lineHeight: 1 }}>
-                  <Counter to={s.value} suffix={s.suffix} />
+                <div className="font-display font-extrabold mb-1 leading-tight" style={{ fontSize: 'clamp(16px,2vw,22px)', color: isDark ? '#FFD60A' : '#B45309' }}>
+                  {s.headline}
                 </div>
-                <div className="text-slate-500 text-[13px] tracking-wide">{tr.stats[i]}</div>
+                <div className="text-slate-500 text-[13px] tracking-wide leading-snug">{s.label}</div>
               </div>
             </Reveal>
           ))}
@@ -434,8 +410,10 @@ export default function HomePage({ setPage }: { setPage: (p: string) => void }) 
           </div>
           <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4" style={{ borderTop: '1px solid var(--divider)' }}>
             <p className="text-slate-600 text-[13px]">© {new Date().getFullYear()} BugToByte Academy. {tr.footer.rights}</p>
-            <div className="flex items-center gap-5">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <button onClick={() => go('terms')} className="text-slate-600 text-[12px] hover:text-brand-yellow transition-colors">Terms & Conditions</button>
+              <button onClick={() => go('privacy')} className="text-slate-600 text-[12px] hover:text-brand-yellow transition-colors">{tr.footer.privacy}</button>
+              <button onClick={() => go('impressum')} className="text-slate-600 text-[12px] hover:text-brand-yellow transition-colors">{tr.footer.impressum}</button>
               <button onClick={() => setPage('login')} className="text-slate-600 text-[12px] hover:text-slate-500 transition-colors">{tr.footer.staffLogin}</button>
             </div>
           </div>

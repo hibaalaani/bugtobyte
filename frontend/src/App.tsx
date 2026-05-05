@@ -17,6 +17,8 @@ import Dashboard      from '@/pages/Dashboard'
 import ResetPassword  from '@/pages/ResetPassword'
 import TermsPage      from '@/pages/Terms'
 import CoursePage     from '@/pages/CoursePage'
+import PrivacyPage    from '@/pages/Privacy'
+import ImpressumPage  from '@/pages/Impressum'
 
 const TRANSITION = {
   initial:  { opacity: 0, y: 14 },
@@ -71,6 +73,8 @@ function AppInner() {
       case 'reset-password': return <ResetPassword  setPage={setPage} />
       case 'terms':          return <TermsPage      setPage={setPage} />
       case 'course':         return <CoursePage     setPage={setPage} />
+      case 'privacy':        return <PrivacyPage    setPage={setPage} />
+      case 'impressum':      return <ImpressumPage  setPage={setPage} />
       default:               return <HomePage       setPage={setPage} />
     }
   }

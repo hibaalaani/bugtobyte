@@ -5,19 +5,27 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import toast from 'react-hot-toast'
 
-type Mode = 'login' | 'signup' | 'forgot'
+type Mode = 'login' | 'signup' | 'forgot' | 'confirm-pending'
 
 export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: (p: string) => void; initialMode?: Mode }) {
-  const [mode,     setMode]     = useState<Mode>(initialMode)
-  const [email,    setEmail]    = useState('')
-  const [password, setPassword] = useState('')
-  const [name,     setName]     = useState('')
-  const [showPass, setShowPass] = useState(false)
-  const [loading,  setLoading]  = useState(false)
+  const [mode,           setMode]          = useState<Mode>(initialMode)
+  const [email,          setEmail]          = useState('')
+  const [password,       setPassword]       = useState('')
+  const [name,           setName]           = useState('')
+  const [showPass,       setShowPass]       = useState(false)
+  const [loading,        setLoading]        = useState(false)
+  const [pendingEmail,   setPendingEmail]   = useState('')
 
   const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth()
   const { tr } = useLanguage()
   const a = tr.auth
+
+  const isEmailUnconfirmedError = (msg: string) =>
+    msg.includes('confirm') ||
+    msg.includes('verif') ||
+    msg.includes('not confirmed') ||
+    // Supabase sometimes masks unconfirmed email as "Invalid login credentials"
+    msg.includes('invalid login credentials')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,8 +35,8 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
       const { error } = await signInWithEmail(email, password)
       if (error) {
         const msg = error.message.toLowerCase()
-        if (msg.includes('email') && (msg.includes('confirm') || msg.includes('verif'))) {
-          toast.error(a.confirmEmail)
+        if (isEmailUnconfirmedError(msg)) {
+          toast.error(a.confirmEmail, { duration: 6000 })
         } else {
           toast.error(error.message)
         }
@@ -46,8 +54,12 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
       if (password.length < 8) { toast.error(a.passwordLength); setLoading(false); return }
       const { error } = await signUpWithEmail(email, password, name)
       if (error) { toast.error(error.message); setLoading(false); return }
-      toast.success(a.accountCreated)
-      setMode('login')
+      // Stay on a "check your email" screen instead of switching to login
+      // (avoids the confusing loop of login → "invalid credentials" before confirmation)
+      setPendingEmail(email)
+      setMode('confirm-pending')
+      setLoading(false)
+      return
     }
 
     if (mode === 'forgot') {
@@ -65,8 +77,8 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
     catch { toast.error(a.googleFailed) }
   }
 
-  const title = mode === 'login' ? a.welcomeBack : mode === 'signup' ? a.createAccount : a.resetPassword
-  const subtitle = mode === 'login' ? a.signInSub : mode === 'signup' ? a.signUpSub : a.resetSub
+  const title = mode === 'login' ? a.welcomeBack : mode === 'signup' ? a.createAccount : mode === 'confirm-pending' ? 'Check Your Email' : a.resetPassword
+  const subtitle = mode === 'login' ? a.signInSub : mode === 'signup' ? a.signUpSub : mode === 'confirm-pending' ? `We sent a confirmation link to ${pendingEmail}` : a.resetSub
   const submitLabel = loading ? a.waiting : mode === 'login' ? a.signIn : mode === 'signup' ? a.createAccount : a.sendReset
 
   return (
@@ -86,7 +98,31 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
 
         <div style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.08)', borderRadius:12, padding:36 }}>
 
-          {mode !== 'forgot' && (
+          {/* ── Email confirmation pending screen ── */}
+          {mode === 'confirm-pending' && (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>📬</div>
+              <p style={{ color: 'rgba(240,239,231,.7)', fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
+                Click the link in your inbox to confirm your account, then come back and sign in.
+              </p>
+              <p style={{ color: 'rgba(240,239,231,.4)', fontFamily: 'IBM Plex Sans, sans-serif', fontSize: 13, marginBottom: 28 }}>
+                No email? Check your spam folder or{' '}
+                <button
+                  onClick={() => { setEmail(pendingEmail); setMode('login') }}
+                  style={{ background: 'none', border: 'none', color: '#00FF87', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}>
+                  try signing in anyway
+                </button>
+                {' '}if you disabled email confirmation in Supabase.
+              </p>
+              <button
+                onClick={() => { setMode('login'); setEmail(pendingEmail) }}
+                style={{ width: '100%', background: 'linear-gradient(135deg,#00FF87,#00D4AA)', color: '#050A12', border: 'none', borderRadius: 8, padding: '14px', fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+                Go to Sign In →
+              </button>
+            </div>
+          )}
+
+          {mode !== 'forgot' && mode !== 'confirm-pending' && (
             <>
               <button onClick={handleGoogle} style={{ width:'100%', background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.12)', borderRadius:8, padding:'13px 20px', color:'#F0EFE7', fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:14, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:24 }} onMouseEnter={e => (e.currentTarget.style.background='rgba(255,255,255,.09)')} onMouseLeave={e => (e.currentTarget.style.background='rgba(255,255,255,.06)')}>
                 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.2 0 5.7 1.1 7.6 2.9l5.6-5.6C33.7 3.5 29.2 1.5 24 1.5 14.9 1.5 7.2 6.8 3.6 14.4l6.6 5.1C12 13.8 17.4 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h12.7c-.6 3-2.4 5.5-4.9 7.2l7.6 5.9c4.5-4.2 7.1-10.3 7.1-17.2z"/><path fill="#FBBC05" d="M10.2 28.5a14.6 14.6 0 010-9l-6.6-5.1A22.6 22.6 0 001.5 24c0 3.6.9 7.1 2.5 10.1l6.2-5.6z"/><path fill="#34A853" d="M24 46.5c5.2 0 9.6-1.7 12.8-4.6l-7.6-5.9c-1.7 1.1-3.9 1.8-5.2 1.8-6.6 0-12-4.3-13.8-10l-6.2 5.6C7.2 41.2 14.9 46.5 24 46.5z"/></svg>
@@ -100,7 +136,7 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
             </>
           )}
 
-          <form onSubmit={handleSubmit}>
+          {mode !== 'confirm-pending' && <form onSubmit={handleSubmit}>
             {mode === 'signup' && (
               <div style={{ marginBottom:18 }}>
                 <label style={{ display:'block', fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:12, letterSpacing:'0.08em', color:'rgba(240,239,231,.6)', marginBottom:8, textTransform:'uppercase' }}>{a.fullName}</label>
@@ -142,20 +178,22 @@ export default function AuthPage({ setPage, initialMode = 'login' }: { setPage: 
               {submitLabel}
               {!loading && <ArrowRight size={16} />}
             </button>
-          </form>
+          </form>}
 
-          <div style={{ textAlign:'center', marginTop:24, paddingTop:24, borderTop:'1px solid rgba(255,255,255,.07)' }}>
-            {mode === 'login' ? (
-              <p style={{ color:'rgba(240,239,231,.5)', fontFamily:'IBM Plex Sans, sans-serif', fontSize:14 }}>
-                {a.noAccount}{' '}
-                <button onClick={() => setMode('signup')} style={{ background:'none', border:'none', color:'#00FF87', cursor:'pointer', fontWeight:600, fontFamily:'inherit', fontSize:'inherit' }}>{a.signUpFree}</button>
-              </p>
-            ) : (
-              <button onClick={() => setMode('login')} style={{ background:'none', border:'none', color:'rgba(240,239,231,.5)', cursor:'pointer', fontFamily:'IBM Plex Sans, sans-serif', fontSize:14 }}>
-                {a.backToLogin}
-              </button>
-            )}
-          </div>
+          {mode !== 'confirm-pending' && (
+            <div style={{ textAlign:'center', marginTop:24, paddingTop:24, borderTop:'1px solid rgba(255,255,255,.07)' }}>
+              {mode === 'login' ? (
+                <p style={{ color:'rgba(240,239,231,.5)', fontFamily:'IBM Plex Sans, sans-serif', fontSize:14 }}>
+                  {a.noAccount}{' '}
+                  <button onClick={() => setMode('signup')} style={{ background:'none', border:'none', color:'#00FF87', cursor:'pointer', fontWeight:600, fontFamily:'inherit', fontSize:'inherit' }}>{a.signUpFree}</button>
+                </p>
+              ) : (
+                <button onClick={() => setMode('login')} style={{ background:'none', border:'none', color:'rgba(240,239,231,.5)', cursor:'pointer', fontFamily:'IBM Plex Sans, sans-serif', fontSize:14 }}>
+                  {a.backToLogin}
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         <div style={{ textAlign:'center', marginTop:24 }}>

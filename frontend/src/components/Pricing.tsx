@@ -97,7 +97,7 @@ export default function Pricing({ onSelectPlan, setPage }: PricingProps) {
           ╚══════════════════════════════════════════════════╝ */}
       <section
         id="pricing"
-        className="relative py-28 overflow-hidden"
+        className="relative py-16 md:py-28 overflow-hidden"
         style={{
           background: isDark
             ? 'linear-gradient(180deg,#0A0C1A 0%,#0D1030 50%,#0A0C1A 100%)'
@@ -118,10 +118,10 @@ export default function Pricing({ onSelectPlan, setPage }: PricingProps) {
             initial={{ y: 40, opacity: 0 }}
             animate={inView ? { y: 0, opacity: 1 } : {}}
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center mb-20"
+            className="text-center mb-12 md:mb-20"
           >
             <span className="tag"><Sparkles size={11} /> {tr.pricing.tag}</span>
-            <h2 className="font-display font-extrabold text-4xl md:text-[52px] leading-[1.07] tracking-tight mb-5" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="font-display font-extrabold text-3xl md:text-[52px] leading-[1.07] tracking-tight mb-5" style={{ color: 'var(--text-primary)' }}>
               {tr.pricing.title1}{' '}
               <span className="bg-clip-text text-transparent inline-block"
                 style={{ backgroundImage: isDark ? 'linear-gradient(135deg,#FFD60A,#FFE040)' : 'linear-gradient(135deg,#92400E,#D97706)' }}>
@@ -266,7 +266,7 @@ export default function Pricing({ onSelectPlan, setPage }: PricingProps) {
       {/* ╔══════════════════════════════════════════════════╗
           ║  FAQ                                            ║
           ╚══════════════════════════════════════════════════╝ */}
-      <section id="faq" className="relative py-28" style={{ background: 'var(--bg-main)' }}>
+      <section id="faq" className="relative py-16 md:py-28" style={{ background: 'var(--bg-main)' }}>
         <div className="grid-bg absolute inset-0 pointer-events-none opacity-25" />
 
         <div className="relative z-10 max-w-3xl mx-auto px-6">
@@ -276,10 +276,10 @@ export default function Pricing({ onSelectPlan, setPage }: PricingProps) {
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="text-center mb-14"
+            className="text-center mb-10 md:mb-14"
           >
             <span className="tag">{tr.pricing.faqTag}</span>
-            <h2 className="font-display font-extrabold text-4xl md:text-[48px] leading-[1.08] tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="font-display font-extrabold text-3xl md:text-[48px] leading-[1.08] tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>
               {tr.pricing.faqTitle}
             </h2>
             <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
