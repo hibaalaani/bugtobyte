@@ -19,8 +19,10 @@ router.post('/', async (req: Request, res: Response) => {
     // Supabase stores the message (with RLS policy allowing public insert)
     await supabaseAdmin.from('contact_messages').insert(body)
 
-    // Email admin (best-effort)
-    sendContactNotification(body).catch((e: Error) => console.error('[contact email]', e.message))
+    // Email admin
+    sendContactNotification(body)
+      .then(() => console.log('[contact email] sent ok to', process.env.ADMIN_EMAIL))
+      .catch((e: Error) => console.error('[contact email] FAILED:', e.message))
 
     res.status(201).json({ success: true })
   } catch (err: any) {
