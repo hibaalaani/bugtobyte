@@ -13,7 +13,6 @@ import morgan  from 'morgan'
 import dotenv  from 'dotenv'
 import Stripe  from 'stripe'
 import { supabaseAdmin } from './lib/supabase'
-import { transporter }   from './lib/email'
 import bookingsRouter    from './routes/bookings'
 import contactRouter     from './routes/contact'
 import { requireAuth }   from './middleware/auth'
@@ -116,11 +115,6 @@ void (async () => {
     console.warn('⚠️   Supabase warning:', err.message)
   }
 })()
-
-// Verify mail
-transporter.verify()
-  .then(() => console.log('✅  Mail server ready'))
-  .catch((e: Error) => console.warn('⚠️   Mail:', e.message))
 
 app.listen(PORT, () => console.log(`🚀  BugToByte API running at http://localhost:${PORT}`))
 

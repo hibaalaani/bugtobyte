@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { z } from 'zod'
 import { supabaseAdmin } from '../lib/supabase'
-import { transporter } from '../lib/email'
+import { sendContactNotification } from '../lib/email'
 
 const router = Router()
 
@@ -19,13 +19,8 @@ router.post('/', async (req: Request, res: Response) => {
     // Supabase stores the message (with RLS policy allowing public insert)
     await supabaseAdmin.from('contact_messages').insert(body)
 
-    // Email admin
-    transporter.sendMail({
-      from:    process.env.FROM_EMAIL,
-      to:      process.env.ADMIN_EMAIL,
-      subject: `💬 Contact: ${body.name} — ${body.subject ?? 'No subject'}`,
-      html:    `<p><strong>${body.name}</strong> (${body.email})</p><p>${body.message}</p>`,
-    }).catch((e: Error) => console.error('[contact email]', e.message))
+    // Email admin (best-effort)
+    sendContactNotification(body).catch((e: Error) => console.error('[contact email]', e.message))
 
     res.status(201).json({ success: true })
   } catch (err: any) {

@@ -27,6 +27,15 @@ async function sendEmail(to: string, subject: string, html: string) {
   }
 }
 
+export async function sendContactNotification(data: { name: string; email: string; subject?: string; message: string }) {
+  if (!ADMIN_EMAIL) return
+  await sendEmail(
+    ADMIN_EMAIL,
+    `💬 Contact: ${data.name} — ${data.subject ?? 'No subject'}`,
+    `<p><strong>${data.name}</strong> (${data.email})</p><p>${data.message}</p>`,
+  )
+}
+
 export async function sendBookingConfirmation(data: BookingEmailData) {
   const html = `<!DOCTYPE html>
 <html>
