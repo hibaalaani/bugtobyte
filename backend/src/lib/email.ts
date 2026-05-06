@@ -1,12 +1,6 @@
-import nodemailer from 'nodemailer'
-
-const port = Number(process.env.SMTP_PORT) || 587
-export const transporter = nodemailer.createTransport({
-  host:   process.env.SMTP_HOST,
-  port,
-  secure: port === 465,
-  auth:   { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-})
+const RESEND_API_KEY = process.env.RESEND_API_KEY
+const FROM_EMAIL    = process.env.FROM_EMAIL || 'hello@bugtobyte.com'
+const ADMIN_EMAIL   = process.env.ADMIN_EMAIL || ''
 
 interface BookingEmailData {
   parentName:  string
@@ -16,6 +10,21 @@ interface BookingEmailData {
   courseName?: string
   zoomLink?:   string
   bookingId:   string
+}
+
+async function sendEmail(to: string, subject: string, html: string) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method:  'POST',
+    headers: {
+      'Authorization': `Bearer ${RESEND_API_KEY}`,
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify({ from: FROM_EMAIL, to: [to], subject, html }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(`Resend API error ${res.status}: ${JSON.stringify(body)}`)
+  }
 }
 
 export async function sendBookingConfirmation(data: BookingEmailData) {
@@ -49,8 +58,10 @@ export async function sendBookingConfirmation(data: BookingEmailData) {
 </body>
 </html>`
 
+  const adminHtml = `<p>New booking from <strong>${data.parentName}</strong> (${data.parentEmail})</p><p>Date: ${data.date} at ${data.time}</p><p>ID: ${data.bookingId}</p>`
+
   await Promise.all([
-    transporter.sendMail({ from: process.env.FROM_EMAIL, to: data.parentEmail, subject: `✅ Demo Confirmed — ${data.date} at ${data.time}`, html }),
-    transporter.sendMail({ from: process.env.FROM_EMAIL, to: process.env.ADMIN_EMAIL, subject: `[ADMIN] New Booking: ${data.parentName} — ${data.date}`, html: `<p>New booking from <strong>${data.parentName}</strong> (${data.parentEmail})</p><p>Date: ${data.date} at ${data.time}</p><p>ID: ${data.bookingId}</p>` }),
+    sendEmail(data.parentEmail, `✅ Demo Confirmed — ${data.date} at ${data.time}`, html),
+    ADMIN_EMAIL ? sendEmail(ADMIN_EMAIL, `[ADMIN] New Booking: ${data.parentName} — ${data.date}`, adminHtml) : Promise.resolve(),
   ])
 }
