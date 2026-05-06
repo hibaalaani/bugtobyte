@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export default function ContactPage() {
   const { tr } = useLanguage()
@@ -15,8 +16,12 @@ export default function ContactPage() {
     e.preventDefault()
     if (form.message.length < 10) { toast.error(c.errShort); return }
     setStatus('loading')
-    const { error } = await supabase.from('contact_messages').insert(form)
-    if (error) { toast.error(c.errFailed); setStatus('idle'); return }
+    const res = await fetch(`${API}/api/contact`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(form),
+    })
+    if (!res.ok) { toast.error(c.errFailed); setStatus('idle'); return }
     setStatus('success')
   }
 
