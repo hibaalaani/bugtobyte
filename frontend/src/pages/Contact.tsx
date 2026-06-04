@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react'
+import { getWaUrl } from '@/utils/whatsapp'
 import toast from 'react-hot-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export default function ContactPage() {
-  const { tr } = useLanguage()
-  const c = tr.contact
+  const { tr, lang } = useLanguage()
+  const c    = tr.contact
+  const waUrl = getWaUrl(lang)
   const [form, setForm]     = useState({ name:'', email:'', subject:'', message:'' })
   const [status, setStatus] = useState<'idle'|'loading'|'success'>('idle')
 
@@ -45,18 +47,22 @@ export default function ContactPage() {
         {/* Info */}
         <motion.div initial={{ x:-40, opacity:0 }} animate={{ x:0, opacity:1 }} transition={{ duration:.7, delay:.1 }}>
           {[
-            { icon:Mail,   color:'#00FF87', label: c.emailLbl, value:'hello@bugtobyte.com'    },
-            { icon:Phone,  color:'#60A5FA', label: c.whatsapp, value:'+49 (0) — via WhatsApp'  },
-            { icon:MapPin, color:'#A78BFA', label: c.location, value:'Berlin, Germany 🇩🇪'      },
-            { icon:Clock,  color:'#f59e0b', label: c.hours,    value:'Mon–Sat, 9am–5pm CET'    },
-          ].map(({ icon:Icon, color, label, value }) => (
+            { icon:Mail,   color:'#00FF87', label: c.emailLbl, value:'hello@bugtobyte.com', href: 'mailto:hello@bugtobyte.com' },
+            { icon:Phone,  color:'#25D366', label: c.whatsapp, value:'WhatsApp us directly', href: waUrl },
+            { icon:MapPin, color:'#A78BFA', label: c.location, value:'Berlin, Germany 🇩🇪',  href: undefined },
+            { icon:Clock,  color:'#f59e0b', label: c.hours,    value:'Mon–Sat, 9am–5pm CET', href: undefined },
+          ].map(({ icon:Icon, color, label, value, href }) => (
             <motion.div key={label} whileHover={{ x:4 }} style={{ display:'flex', gap:18, alignItems:'center', padding:'20px 0', borderBottom:'1px solid rgba(255,255,255,.05)' }}>
               <div style={{ width:48, height:48, borderRadius:10, background:`${color}14`, border:`1px solid ${color}28`, display:'grid', placeItems:'center', flexShrink:0 }}>
                 <Icon size={20} color={color} />
               </div>
               <div>
                 <div style={{ fontSize:11, fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(240,239,231,.4)', marginBottom:4 }}>{label}</div>
-                <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:16, color:'#F0EFE7' }}>{value}</div>
+                {href ? (
+                  <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:16, color, textDecoration:'none' }}>{value}</a>
+                ) : (
+                  <div style={{ fontFamily:'IBM Plex Sans, sans-serif', fontWeight:600, fontSize:16, color:'#F0EFE7' }}>{value}</div>
+                )}
               </div>
             </motion.div>
           ))}

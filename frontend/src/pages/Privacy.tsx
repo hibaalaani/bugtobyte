@@ -66,7 +66,7 @@ export default function PrivacyPage({ setPage }: { setPage: (p: string) => void 
         <Section title="1. Who We Are" delay={0.05}>
           <p>
             BugToByte Academy ("<strong>BugToByte</strong>", "we", "us", or "our") is an online coding school
-            providing live, small-group classes for children aged 7–14. We are based in Berlin, Germany, and
+            providing live, small-group classes for children aged 7–18. We are based in Berlin, Germany, and
             operate under German law and applicable European Union data-protection regulations.
           </p>
           <p>

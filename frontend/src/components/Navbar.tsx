@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 
-export default function Navbar({ page, setPage }: { page: string; setPage: (p: string) => void }) {
+export default function Navbar({ page, setPage, topOffset = 0 }: { page: string; setPage: (p: string) => void; topOffset?: number }) {
   const { profile, signOut } = useAuth()
   const { tr } = useLanguage()
   const { isDark, toggleTheme } = useTheme()
@@ -38,7 +38,7 @@ export default function Navbar({ page, setPage }: { page: string; setPage: (p: s
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+          position: 'fixed', top: topOffset, left: 0, right: 0, zIndex: 200,
           background: navBg,
           backdropFilter: (scrolled || !isDark) ? 'blur(20px)' : 'none',
           borderBottom: (scrolled || !isDark) ? '1px solid var(--border-color)' : 'none',

@@ -368,7 +368,7 @@ export const COURSES: CourseData[] = [
     id:'1', slug:'scratch-explorers',
     title:'Scratch Explorers', subtitle:'Block Coding for Beginners',
     description:"Join live interactive sessions where we turn ideas into games. Kids learn logic through play with real-time guidance from their instructor.",
-    ageGroup:'7-9', tool:'Scratch', sessions:12, sessionLen:'60 min', maxStudents:6, priceEUR:119.88,
+    ageGroup:'7-9', tool:'Scratch', sessions:10, sessionLen:'60 min', maxStudents:6, priceEUR:99,
     level:'Beginner',
     skills:['Building interactive stories','Game physics (gravity & jumping)','Loops & \'If-Then\' logic','Variables (Score & Timers)','Creative project design'],
     curriculum:[
@@ -388,7 +388,7 @@ export const COURSES: CourseData[] = [
     id:'2', slug:'python-pioneers',
     title:'Python Pioneers', subtitle:'Real Code, Real Projects',
     description:"Move from blocks to real text. Build your first apps and games using the language of Google and NASA in a collaborative online classroom.",
-    ageGroup:'10-12', tool:'Python', sessions:16, sessionLen:'60 min', maxStudents:5, priceEUR:159.84,
+    ageGroup:'10-12', tool:'Python', sessions:13, sessionLen:'60 min', maxStudents:5, priceEUR:129,
     level:'Intermediate',
     skills:['Fundamentals (Print, Input, Variables)','Lists and Data Collections','Defining Functions','While Loops & Game Logic','Final Project: Text-Based Adventure Game'],
     curriculum:[
@@ -410,7 +410,7 @@ export const COURSES: CourseData[] = [
     id:'3', slug:'ai-innovators',
     title:'AI Innovators', subtitle:'Machine Learning & AI Tools',
     description:"Step into the future. Learn to train models and use AI tools to solve problems, guided by live demonstrations and hands-on projects.",
-    ageGroup:'13+', tool:'AI Tools', sessions:10, sessionLen:'60 min', maxStudents:5, priceEUR:99.90,
+    ageGroup:'13-18', tool:'AI Tools', sessions:10, sessionLen:'60 min', maxStudents:5, priceEUR:99,
     level:'Advanced',
     skills:['Introduction to Machine Learning','Training Visual Recognition models','Prompt Engineering & Generative AI','AI Ethics & Digital Safety','Building a simple AI Chatbot interface'],
     curriculum:[

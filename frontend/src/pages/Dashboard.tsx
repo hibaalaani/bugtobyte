@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useMemo } from 'react'
-import { Calendar, Clock, Video, LogOut, Plus, CheckCircle, User } from 'lucide-react'
+import { Calendar, Clock, Video, LogOut, Plus, CheckCircle, User, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useBookings } from '@/hooks/useBookings'
 import toast from 'react-hot-toast'
@@ -16,7 +16,8 @@ const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
 }
 
 export default function Dashboard({ setPage }: { setPage: (p: string) => void }) {
-  const { profile, signOut } = useAuth()
+  const { profile, signOut, user } = useAuth()
+  const isAdmin = user?.email === 'hiba.a.alaani@gmail.com'
   const { bookings, loading, cancelBooking } = useBookings()
   const { tr } = useLanguage()
   const d = tr.dashboard
@@ -62,6 +63,11 @@ export default function Dashboard({ setPage }: { setPage: (p: string) => void })
             </h1>
           </div>
           <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+            {isAdmin && (
+              <motion.button whileHover={{ y:-2 }} onClick={() => setPage('admin')} style={{ background:'rgba(167,139,250,.12)', border:'1px solid rgba(167,139,250,.3)', borderRadius:6, padding:'11px 18px', color:'#A78BFA', fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:14, cursor:'pointer', display:'flex', alignItems:'center', gap:8 }}>
+                <ShieldCheck size={15} /> Admin Panel
+              </motion.button>
+            )}
             <motion.button whileHover={{ y:-2 }} onClick={() => { setPage('booking'); window.scrollTo({ top:0 }); }} style={{ background:'linear-gradient(135deg,#00FF87,#00D4AA)', color:'#050A12', border:'none', borderRadius:6, padding:'11px 22px', fontFamily:'IBM Plex Sans, sans-serif', fontWeight:700, fontSize:14, cursor:'pointer', display:'flex', alignItems:'center', gap:8 }}>
               <Plus size={16} /> {tr.nav.bookDemo}
             </motion.button>

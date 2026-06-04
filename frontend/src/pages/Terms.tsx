@@ -15,7 +15,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 const SECTIONS = [
   {
     title: '1. Who We Are',
-    body: `BugToByte Academy is an online coding school for children aged 7–14, operated by Hiba Al-Aani, based in Berlin, Germany.
+    body: `BugToByte Academy is an online coding school for children aged 7–18, operated by Hiba Al-Aani, based in Berlin, Germany.
 
 Contact: hello@bugtobyte.com
 Website: bugtobyte.com
@@ -24,7 +24,7 @@ These Terms and Conditions govern the contractual relationship between BugToByte
   },
   {
     title: '2. Scope of Services',
-    body: `BugToByte Academy provides live, small-group online coding classes for children aged 7–14. Current courses include:
+    body: `BugToByte Academy provides live, small-group online coding classes for children aged 7–18. Current courses include:
 
 • Scratch Creators (Ages 7–9) — 8 sessions, 45 min each
 • AI Fundamentals (Ages 10–12) — 8 sessions, 60 min each
@@ -51,9 +51,9 @@ You should retain the confirmation email as it contains important information ab
     body: `All prices are stated in Euro (€) and include applicable VAT where required by law. Full payment is due at the time of booking to secure your child's place.
 
 Current course prices:
-• Starter Plan (1 course): €79.99
-• Explorer Plan (2 courses): €149.99
-• Prodigy Plan (all 3 courses): €239.99
+• Starter Plan (AI Innovators): €99
+• Explorer Plan (2 courses): €189
+• Prodigy Plan (all 3 courses): €269
 
 Individual session price: €9.99/session
 

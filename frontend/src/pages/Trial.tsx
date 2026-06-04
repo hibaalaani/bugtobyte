@@ -69,7 +69,7 @@ export default function Trial({ setPage }: { setPage: (p: string) => void }) {
             Starts Here — For Free
           </h1>
           <p style={styles.sub}>
-            A live, 45-minute online session for kids aged 7–14. They'll build a real game,
+            A live, 45-minute online session for kids aged 7–18. They'll build a real game,
             meet their teacher, and get a personalised roadmap — completely free.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>

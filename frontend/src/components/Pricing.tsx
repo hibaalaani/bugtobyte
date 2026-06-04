@@ -8,9 +8,9 @@ import { useTheme } from '@/contexts/ThemeContext'
 // Structural plan data — each card has its own neon color
 // ─────────────────────────────────────────────────────────────
 const PLAN_STRUCTURE = [
-  { id: 'starter',  icon: Zap,    price: 99.90,  perSession: '€9.99', color: '#00E5FF', colorRgb: '0,229,255',   bgLight: '#E8FFFE', featured: false },
-  { id: 'explorer', icon: Star,   price: 219.99, perSession: '€9.13', color: '#FFD60A', colorRgb: '255,214,10',  bgLight: '#FFFBF0', featured: true  },
-  { id: 'prodigy',  icon: Rocket, price: 349.99, perSession: '€9.21', color: '#FF4081', colorRgb: '255,64,129',  bgLight: '#FFF0F5', featured: false },
+  { id: 'starter',  icon: Zap,    price: 99,  perSession: '€9.99', color: '#00E5FF', colorRgb: '0,229,255',   bgLight: '#E8FFFE', featured: false },
+  { id: 'explorer', icon: Star,   price: 189, perSession: '€9.99', color: '#FFD60A', colorRgb: '255,214,10',  bgLight: '#FFFBF0', featured: true  },
+  { id: 'prodigy',  icon: Rocket, price: 269, perSession: '€9.99', color: '#FF4081', colorRgb: '255,64,129',  bgLight: '#FFF0F5', featured: false },
 ]
 
 // ─────────────────────────────────────────────────────────────
@@ -199,12 +199,12 @@ export default function Pricing({ onSelectPlan, setPage }: PricingProps) {
                         <span className="font-display font-extrabold leading-none" style={{ fontSize: 44, color: 'var(--text-primary)' }}>
                           €{plan.price}
                         </span>
-                        <div className="mb-1.5">
+                        {/* <div className="mb-1.5">
                           <span className="text-[11px] font-bold px-2 py-0.5 rounded-full font-display"
                             style={{ background: `rgba(${rgb},0.12)`, color: c }}>
                             {plan.perSession}{tr.pricing.perSession}
                           </span>
-                        </div>
+                        </div> */}
                       </div>
                       <div className="text-[13px] mt-1" style={{ color: 'var(--text-muted)' }}>{tPlan.sessions} · {tPlan.period}</div>
                     </div>

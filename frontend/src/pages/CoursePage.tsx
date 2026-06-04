@@ -39,7 +39,7 @@ export default function CoursePage({ setPage }: { setPage: (p: string) => void }
   const c = COLOR_MAP[course.color]
   const Icon = TOOL_ICON[course.tool] ?? Zap
   const SESSION_PRICE = 9.99
-  const totalPrice = (course.sessions * SESSION_PRICE).toFixed(2)
+  const totalPrice = course.priceEUR
   const levelLabel = { Beginner: t.levelBeginner, Intermediate: t.levelIntermediate, Advanced: t.levelAdvanced }
 
   const go = (p: string) => { setPage(p); window.scrollTo({ top: 0 }) }
