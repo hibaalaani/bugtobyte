@@ -24,7 +24,7 @@ CREATE TABLE public.kids (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   parent_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   name          TEXT NOT NULL,
-  age           SMALLINT NOT NULL CHECK (age BETWEEN 5 AND 17),
+  age           SMALLINT NOT NULL CHECK (age BETWEEN 5 AND 18),
   skill_level   TEXT NOT NULL DEFAULT 'beginner' CHECK (skill_level IN ('beginner','intermediate','advanced')),
   interests     TEXT[] DEFAULT '{}',
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -38,7 +38,7 @@ CREATE TABLE public.courses (
   description   TEXT,
   category      TEXT,
   age_min       SMALLINT DEFAULT 7,
-  age_max       SMALLINT DEFAULT 17,
+  age_max       SMALLINT DEFAULT 18,
   duration_weeks SMALLINT DEFAULT 6,
   price_usd     NUMERIC(8,2) NOT NULL DEFAULT 0,
   thumbnail_url TEXT,
@@ -220,25 +220,25 @@ INSERT INTO public.courses
   (title, slug, description, category, age_min, age_max, duration_weeks, price_usd, is_active, sort_order)
 VALUES
   (
-    'Scratch Creators',
-    'scratch-creators',
+    'Scratch Explorers',
+    'scratch-explorers',
     'Young learners dive into MIT''s Scratch environment to design animated stories, interactive games, and creative simulations. No typing required — just drag, drop, and discover the joy of making things move.',
     'Scratch',
-    7, 9, 8, 149.00, TRUE, 1
+    7, 9, 12, 119.88, TRUE, 1
   ),
   (
-    'AI Fundamentals',
-    'ai-fundamentals',
-    'Students uncover how AI really works by training real machine-learning models and deploying them inside Scratch. Text recognition, image classification, sound detection — they build it all.',
-    'AI',
-    10, 12, 8, 179.00, TRUE, 2
-  ),
-  (
-    'Python Lab',
-    'python-lab',
+    'Python Pioneers',
+    'python-pioneers',
     'Teens graduate from blocks to professional Python — the language of Google, NASA, and Netflix. They build functional apps, data projects, and games using the same tools real developers use every day.',
     'Python',
-    13, 14, 10, 199.00, TRUE, 3
+    10, 12, 16, 159.84, TRUE, 2
+  ),
+  (
+    'AI Innovators',
+    'ai-innovators',
+    'Students uncover how AI really works by training real machine-learning models and using cutting-edge AI tools. Text recognition, image classification, prompt engineering — they build it all.',
+    'AI',
+    13, 17, 10, 99.90, TRUE, 3
   );
 
 -- Update testimonials with real parent voices

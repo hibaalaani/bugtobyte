@@ -410,7 +410,7 @@ export const COURSES: CourseData[] = [
     id:'3', slug:'ai-innovators',
     title:'AI Innovators', subtitle:'Machine Learning & AI Tools',
     description:"Step into the future. Learn to train models and use AI tools to solve problems, guided by live demonstrations and hands-on projects.",
-    ageGroup:'13-18', tool:'AI Tools', sessions:10, sessionLen:'60 min', maxStudents:5, priceEUR:99,
+    ageGroup:'13+', tool:'AI Tools', sessions:10, sessionLen:'60 min', maxStudents:5, priceEUR:99,
     level:'Advanced',
     skills:['Introduction to Machine Learning','Training Visual Recognition models','Prompt Engineering & Generative AI','AI Ethics & Digital Safety','Building a simple AI Chatbot interface'],
     curriculum:[
