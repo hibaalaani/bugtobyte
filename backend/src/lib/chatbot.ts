@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from './supabase'
+import { notifyTeam } from './notify'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -17,9 +18,23 @@ Booking: parents book demos and courses through the live calendar on the website
 Refunds: full refund within 48 hours of the first session.
 
 Be warm, concise, and helpful. Answer questions about courses, pricing, scheduling, and the booking process.
-If asked something you don't know (specific availability, account issues, payments), say a team member will
-follow up, and point them to the contact form or the free demo booking. Keep replies to 2-4 sentences —
-this is a chat conversation, not an essay.`
+Keep replies to 2-4 sentences — this is a chat conversation, not an essay.
+
+If a parent explicitly asks to speak with a real teacher/instructor, wants a phone call or callback, or asks for
+a human instead of the chatbot, use the notify_team tool. After calling it, tell the parent the team has been
+notified and someone will reach out to them soon — don't keep answering as if nothing happened.`
+
+const NOTIFY_TOOL: Anthropic.Tool = {
+  name:        'notify_team',
+  description: 'Notify the BugToByte team that a parent wants to be contacted by a real person (teacher, instructor, or staff) instead of continuing with the chatbot. Only call this when the parent explicitly asks for human contact — not for questions the bot can answer itself.',
+  input_schema: {
+    type:       'object',
+    properties: {
+      reason: { type: 'string', description: "Brief summary of what the parent wants, e.g. 'Wants a callback to discuss Python Pioneers scheduling'" },
+    },
+    required: ['reason'],
+  },
+}
 
 const HISTORY_LIMIT = 12
 
@@ -40,12 +55,36 @@ export async function getBotReply(channel: Channel, conversationKey: string, use
 
   messages.push({ role: 'user', content: userMessage })
 
-  const response = await anthropic.messages.create({
+  let response = await anthropic.messages.create({
     model:      'claude-opus-4-8',
     max_tokens: 1024,
     system:     SYSTEM_PROMPT,
+    tools:      [NOTIFY_TOOL],
     messages,
   })
+
+  if (response.stop_reason === 'tool_use') {
+    const toolUse = response.content.find((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use')
+
+    if (toolUse) {
+      const { reason } = toolUse.input as { reason: string }
+      await notifyTeam(channel, conversationKey, reason)
+
+      messages.push({ role: 'assistant', content: response.content })
+      messages.push({
+        role:    'user',
+        content: [{ type: 'tool_result', tool_use_id: toolUse.id, content: 'Team notified successfully.' }],
+      })
+
+      response = await anthropic.messages.create({
+        model:      'claude-opus-4-8',
+        max_tokens: 1024,
+        system:     SYSTEM_PROMPT,
+        tools:      [NOTIFY_TOOL],
+        messages,
+      })
+    }
+  }
 
   const textBlock = response.content.find((b): b is Anthropic.TextBlock => b.type === 'text')
   const reply = textBlock?.text ?? "Sorry, I couldn't process that — could you rephrase?"

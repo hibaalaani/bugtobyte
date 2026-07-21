@@ -49,8 +49,18 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 })
 
 // ── Middleware ────────────────────────────────────────────────
+// CLIENT_ORIGIN accepts a comma-separated list, so the production domain
+// and local dev (http://localhost:3000) can both be allowed at once.
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:3000').split(',').map(o => o.trim())
+
 app.use(helmet({ contentSecurityPolicy: false }))
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000', credentials: true }))
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) callback(null, true)
+    else callback(new Error('Not allowed by CORS'))
+  },
+  credentials: true,
+}))
 app.use(morgan('dev'))
 app.use(express.json())
 

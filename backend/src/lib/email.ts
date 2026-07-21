@@ -12,7 +12,7 @@ interface BookingEmailData {
   bookingId:   string
 }
 
-async function sendEmail(to: string, subject: string, html: string) {
+export async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch('https://api.resend.com/emails', {
     method:  'POST',
     headers: {

@@ -225,6 +225,12 @@ export const TR = {
       successTitle: 'Message Sent!', successDesc: "We'll get back to you within a few hours.", sendAnother: 'Send Another',
       errShort: 'Message is too short', errFailed: 'Something went wrong. Please try again.',
     },
+    chatWidget: {
+      title: 'BugToByte Academy', subtitle: 'Ask me about our courses',
+      initialMessage: "Hi! 👋 Ask me anything about BugToByte's coding courses for your child.",
+      inputPlaceholder: 'Type your question...',
+      error: "Sorry, something went wrong. Please try again, or use the contact form.",
+    },
     auth: {
       welcomeBack: 'Welcome Back', createAccount: 'Create Account', resetPassword: 'Reset Password',
       signInSub: 'Sign in to manage your bookings',
@@ -535,6 +541,12 @@ export const TR = {
       successTitle: 'Nachricht gesendet!', successDesc: 'Wir melden uns innerhalb weniger Stunden.', sendAnother: 'Weitere Nachricht senden',
       errShort: 'Nachricht ist zu kurz', errFailed: 'Etwas ist schiefgelaufen. Bitte erneut versuchen.',
     },
+    chatWidget: {
+      title: 'BugToByte Academy', subtitle: 'Fragen Sie mich zu unseren Kursen',
+      initialMessage: 'Hallo! 👋 Fragen Sie mich alles über die Programmierkurse von BugToByte für Ihr Kind.',
+      inputPlaceholder: 'Schreiben Sie Ihre Frage...',
+      error: 'Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie es erneut oder nutzen Sie das Kontaktformular.',
+    },
     auth: {
       welcomeBack: 'Willkommen zurück', createAccount: 'Konto erstellen', resetPassword: 'Passwort zurücksetzen',
       signInSub: 'Melde dich an, um deine Buchungen zu verwalten',
@@ -844,6 +856,12 @@ export const TR = {
       send: 'إرسال الرسالة', sending: 'جارٍ الإرسال...',
       successTitle: 'تم إرسال الرسالة!', successDesc: 'سنتواصل معك خلال ساعات قليلة.', sendAnother: 'إرسال رسالة أخرى',
       errShort: 'الرسالة قصيرة جداً', errFailed: 'حدث خطأ ما. يرجى المحاولة مجدداً.',
+    },
+    chatWidget: {
+      title: 'BugToByte Academy', subtitle: 'اسألني عن دوراتنا',
+      initialMessage: 'مرحبًا! 👋 اسألني أي شيء عن دورات BugToByte البرمجية لطفلك.',
+      inputPlaceholder: 'اكتب سؤالك...',
+      error: 'عذرًا، حدث خطأ ما. يرجى المحاولة مجددًا أو استخدام نموذج التواصل.',
     },
     auth: {
       welcomeBack: 'مرحباً بعودتك', createAccount: 'إنشاء حساب', resetPassword: 'إعادة تعيين كلمة المرور',

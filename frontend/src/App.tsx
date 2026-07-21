@@ -25,6 +25,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
 import Navbar from '@/components/Navbar'
+import ChatWidget from '@/components/ChatWidget'
 import Trial from '@/pages/Trial'
 import TrialAr from '@/pages/TrialAr'
 import HomePage from '@/pages/Home'
@@ -173,6 +174,9 @@ function AppInner() {
           <WhatsAppIcon />
         </a>
       )}
+
+      {/* ── Floating chat widget ── */}
+      {!HIDE_NAV.includes(page) && <ChatWidget />}
     </div>
   )
 }
