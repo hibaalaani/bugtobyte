@@ -101,6 +101,18 @@ CREATE TABLE public.testimonials (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ── CHAT MESSAGES (chatbot history — website widget + WhatsApp) ──
+CREATE TABLE public.chat_messages (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  channel          TEXT NOT NULL CHECK (channel IN ('web', 'whatsapp')),
+  conversation_key TEXT NOT NULL, -- web: client-generated session id · whatsapp: sender's phone number
+  role             TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+  content          TEXT NOT NULL,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_chat_messages_conversation ON public.chat_messages(channel, conversation_key, created_at);
+
 -- ================================================================
 --  ROW LEVEL SECURITY (RLS)
 -- ================================================================
@@ -111,6 +123,8 @@ ALTER TABLE public.courses           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.appointments      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_messages  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.testimonials      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_messages     ENABLE ROW LEVEL SECURITY;
+-- No public policies on chat_messages — only the backend's service-role key reads/writes chat history.
 
 -- Profiles
 CREATE POLICY "Users can read own profile"   ON public.profiles FOR SELECT USING (auth.uid() = id);

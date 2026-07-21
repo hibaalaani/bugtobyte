@@ -15,6 +15,8 @@ import Stripe  from 'stripe'
 import { supabaseAdmin } from './lib/supabase'
 import bookingsRouter    from './routes/bookings'
 import contactRouter     from './routes/contact'
+import whatsappRouter    from './routes/whatsapp'
+import chatRouter        from './routes/chat'
 import { requireAuth }   from './middleware/auth'
 
 dotenv.config()
@@ -58,6 +60,8 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: new Date().to
 // ── Routes ────────────────────────────────────────────────────
 app.use('/api/bookings', bookingsRouter)
 app.use('/api/contact',  contactRouter)
+app.use('/api/whatsapp', whatsappRouter)
+app.use('/api/chat',     chatRouter)
 
 // ── Stripe checkout session (auth required) ───────────────────
 app.post('/api/stripe/create-checkout', requireAuth, async (req, res) => {
