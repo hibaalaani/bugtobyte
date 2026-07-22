@@ -1,4 +1,4 @@
-export const WA_NUMBER = '4917623168309'
+export const WA_NUMBER = '15551531161'
 
 const MESSAGES: Record<string, string> = {
   en: "Hi BugToByte! 👋 I'd like to know more about your coding courses for my child.",
