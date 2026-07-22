@@ -11,16 +11,19 @@ export async function notifyTeam(channel: Channel, conversationKey: string, reas
     ? `Reached via WhatsApp: ${conversationKey}`
     : `Reached via website chat (session ${conversationKey})`
 
+  // Each channel is isolated — a failure notifying one (e.g. missing RESEND_API_KEY)
+  // must never throw back into the chat flow and block the actual reply to the user.
   await Promise.all([
     ADMIN_EMAIL
       ? sendEmail(
           ADMIN_EMAIL,
           '🙋 Chatbot handoff — parent wants to talk to a person',
           `<p><strong>${contactLine}</strong></p><p>${reason}</p>`,
-        )
+        ).catch((err) => console.error('[notify] email failed:', err.message))
       : Promise.resolve(),
     ADMIN_WHATSAPP_NUMBER
       ? sendWhatsAppMessage(ADMIN_WHATSAPP_NUMBER, `🙋 Chatbot handoff\n${contactLine}\n${reason}`)
+          .catch((err) => console.error('[notify] whatsapp failed:', err.message))
       : Promise.resolve(),
   ])
 }
