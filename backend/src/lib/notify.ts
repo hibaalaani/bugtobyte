@@ -6,10 +6,22 @@ const ADMIN_WHATSAPP_NUMBER  = process.env.ADMIN_WHATSAPP_NUMBER || ''
 
 type Channel = 'web' | 'whatsapp'
 
-export async function notifyTeam(channel: Channel, conversationKey: string, reason: string): Promise<void> {
-  const contactLine = channel === 'whatsapp'
-    ? `Reached via WhatsApp: ${conversationKey}`
-    : `Reached via website chat (session ${conversationKey})`
+export async function notifyTeam(
+  channel: Channel,
+  conversationKey: string,
+  reason: string,
+  parentName?: string,
+  contactMethod?: string,
+): Promise<void> {
+  const lines = [
+    channel === 'whatsapp'
+      ? `Reached via WhatsApp: ${conversationKey}`
+      : `Reached via website chat (session ${conversationKey})`,
+    parentName    ? `Name: ${parentName}` : '',
+    channel === 'web' ? `Contact: ${contactMethod || 'not provided'}` : '',
+  ].filter(Boolean)
+
+  const details = lines.join('\n')
 
   // Each channel is isolated — a failure notifying one (e.g. missing RESEND_API_KEY)
   // must never throw back into the chat flow and block the actual reply to the user.
@@ -18,11 +30,11 @@ export async function notifyTeam(channel: Channel, conversationKey: string, reas
       ? sendEmail(
           ADMIN_EMAIL,
           '🙋 Chatbot handoff — parent wants to talk to a person',
-          `<p><strong>${contactLine}</strong></p><p>${reason}</p>`,
+          `<p><strong>${details.replace(/\n/g, '<br/>')}</strong></p><p>${reason}</p>`,
         ).catch((err) => console.error('[notify] email failed:', err.message))
       : Promise.resolve(),
     ADMIN_WHATSAPP_NUMBER
-      ? sendWhatsAppMessage(ADMIN_WHATSAPP_NUMBER, `🙋 Chatbot handoff\n${contactLine}\n${reason}`)
+      ? sendWhatsAppMessage(ADMIN_WHATSAPP_NUMBER, `🙋 Chatbot handoff\n${details}\n${reason}`)
           .catch((err) => console.error('[notify] whatsapp failed:', err.message))
       : Promise.resolve(),
   ])

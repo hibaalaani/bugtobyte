@@ -4,7 +4,14 @@ import { notifyTeam } from './notify'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const SYSTEM_PROMPT = `You are the BugToByte Academy assistant, chatting with parents on the website and on WhatsApp.
+type Channel = 'web' | 'whatsapp'
+
+function buildSystemPrompt(channel: Channel): string {
+  const contactInstruction = channel === 'web'
+    ? `This conversation is happening on the website widget, which is anonymous — you have no way to know this parent's name, phone number, or email. Before calling notify_team, ask for their name and a phone number or email so a real person can actually reach them back, and pass those into the tool's parent_name / contact_method fields. If they decline to share contact info after being asked once, call notify_team anyway and leave those fields out.`
+    : `This conversation is happening on WhatsApp — you already know the parent's phone number from this channel, so there's no need to ask for it before calling notify_team.`
+
+  return `You are the BugToByte Academy assistant, chatting with parents on the website and on WhatsApp.
 
 BugToByte teaches live, small-group coding & AI classes for kids ages 7-18, taught over Zoom (max 5-6 students per class).
 
@@ -21,8 +28,10 @@ Be warm, concise, and helpful. Answer questions about courses, pricing, scheduli
 Keep replies to 2-4 sentences — this is a chat conversation, not an essay.
 
 If a parent explicitly asks to speak with a real teacher/instructor, wants a phone call or callback, or asks for
-a human instead of the chatbot, use the notify_team tool. After calling it, tell the parent the team has been
-notified and someone will reach out to them soon — don't keep answering as if nothing happened.`
+a human instead of the chatbot, use the notify_team tool. ${contactInstruction}
+After calling notify_team, tell the parent the team has been notified and someone will reach out to them soon —
+don't keep answering as if nothing happened.`
+}
 
 const NOTIFY_TOOL: Anthropic.Tool = {
   name:        'notify_team',
@@ -30,15 +39,15 @@ const NOTIFY_TOOL: Anthropic.Tool = {
   input_schema: {
     type:       'object',
     properties: {
-      reason: { type: 'string', description: "Brief summary of what the parent wants, e.g. 'Wants a callback to discuss Python Pioneers scheduling'" },
+      reason:         { type: 'string', description: "Brief summary of what the parent wants, e.g. 'Wants a callback to discuss Python Pioneers scheduling'" },
+      parent_name:    { type: 'string', description: "The parent's name, if they gave one. Omit if not provided." },
+      contact_method: { type: 'string', description: "Phone number or email the parent gave to be reached at. Required on the website channel unless they declined to share it; not needed on WhatsApp since the number is already known." },
     },
     required: ['reason'],
   },
 }
 
 const HISTORY_LIMIT = 12
-
-type Channel = 'web' | 'whatsapp'
 
 export async function getBotReply(channel: Channel, conversationKey: string, userMessage: string): Promise<string> {
   const { data: history } = await supabaseAdmin
@@ -55,10 +64,12 @@ export async function getBotReply(channel: Channel, conversationKey: string, use
 
   messages.push({ role: 'user', content: userMessage })
 
+  const system = buildSystemPrompt(channel)
+
   let response = await anthropic.messages.create({
     model:      'claude-opus-4-8',
     max_tokens: 1024,
-    system:     SYSTEM_PROMPT,
+    system,
     tools:      [NOTIFY_TOOL],
     messages,
   })
@@ -67,8 +78,10 @@ export async function getBotReply(channel: Channel, conversationKey: string, use
     const toolUse = response.content.find((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use')
 
     if (toolUse) {
-      const { reason } = toolUse.input as { reason: string }
-      await notifyTeam(channel, conversationKey, reason)
+      const { reason, parent_name, contact_method } = toolUse.input as {
+        reason: string; parent_name?: string; contact_method?: string
+      }
+      await notifyTeam(channel, conversationKey, reason, parent_name, contact_method)
 
       messages.push({ role: 'assistant', content: response.content })
       messages.push({
@@ -79,7 +92,7 @@ export async function getBotReply(channel: Channel, conversationKey: string, use
       response = await anthropic.messages.create({
         model:      'claude-opus-4-8',
         max_tokens: 1024,
-        system:     SYSTEM_PROMPT,
+        system,
         tools:      [NOTIFY_TOOL],
         messages,
       })
