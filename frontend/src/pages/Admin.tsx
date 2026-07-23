@@ -522,7 +522,7 @@ export default function AdminPage({ setPage }: { setPage: (p: string) => void })
             ) : conversations.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 60, color: 'rgba(240,239,231,.3)' }}>No WhatsApp conversations yet</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, alignItems: 'start' }}>
+              <div className="whatsapp-inbox" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, alignItems: 'start' }}>
 
                 {/* Conversation list */}
                 <div style={{ background: 'rgba(255,255,255,.02)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, overflow: 'hidden' }}>

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
 import toast from 'react-hot-toast'
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 
 // ─── Batch Banner — update before each new intake ─────────────────────────────
 const BATCH_CONFIG = {
@@ -25,21 +25,33 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import ChatWidget from '@/components/ChatWidget'
-import Trial from '@/pages/Trial'
-import TrialAr from '@/pages/TrialAr'
 import HomePage from '@/pages/Home'
-import AboutPage from '@/pages/About'
-import ContactPage from '@/pages/Contact'
-import BookingPage from '@/pages/Booking'
-import AuthPage from '@/pages/Auth'
-import Dashboard from '@/pages/Dashboard'
-import ResetPassword from '@/pages/ResetPassword'
-import TermsPage from '@/pages/Terms'
-import CoursePage from '@/pages/CoursePage'
-import PrivacyPage from '@/pages/Privacy'
-import ImpressumPage from '@/pages/Impressum'
-import AdminPage from '@/pages/Admin'
+
+// Code-split every other page — only downloaded when a visitor actually
+// navigates there, instead of bundled into the initial homepage load.
+const Trial         = lazy(() => import('@/pages/Trial'))
+const TrialAr        = lazy(() => import('@/pages/TrialAr'))
+const AboutPage      = lazy(() => import('@/pages/About'))
+const ContactPage    = lazy(() => import('@/pages/Contact'))
+const BookingPage    = lazy(() => import('@/pages/Booking'))
+const AuthPage       = lazy(() => import('@/pages/Auth'))
+const Dashboard      = lazy(() => import('@/pages/Dashboard'))
+const ResetPassword  = lazy(() => import('@/pages/ResetPassword'))
+const TermsPage      = lazy(() => import('@/pages/Terms'))
+const CoursePage     = lazy(() => import('@/pages/CoursePage'))
+const PrivacyPage    = lazy(() => import('@/pages/Privacy'))
+const ImpressumPage  = lazy(() => import('@/pages/Impressum'))
+const AdminPage      = lazy(() => import('@/pages/Admin'))
+
+function PageLoader() {
+  return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Loader2 size={28} color="var(--text-muted)" className="animate-spin" />
+    </div>
+  )
+}
 
 const TRANSITION = {
   initial: { opacity: 0, y: 14 },
@@ -147,10 +159,14 @@ function AppInner() {
       <div style={{ marginTop: topOffset, transition: 'margin-top 0.3s ease' }}>
         <AnimatePresence mode="wait">
           <motion.div key={page} {...TRANSITION}>
-            {render()}
+            <Suspense fallback={<PageLoader />}>
+              {render()}
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {!HIDE_NAV.includes(page) && <Footer setPage={setPage} />}
 
       {/* ── Floating WhatsApp button ── */}
       {!HIDE_NAV.includes(page) && (

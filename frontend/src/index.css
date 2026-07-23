@@ -278,7 +278,16 @@ h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.1; }
   .contact-head { padding: 52px 20px 36px !important; }
   /* Contact: info + form grid */
   .contact-body { padding: 0 20px 60px !important; }
+
+  /* Course page: stack the 300px sidebar under the main column instead of squeezing it */
+  .course-columns { grid-template-columns: 1fr !important; }
+
+  /* Admin WhatsApp inbox: stack the conversation list above the thread view */
+  .whatsapp-inbox { grid-template-columns: 1fr !important; }
 }
+
+/* Footer: reserve space so the fixed WhatsApp/chat bubbles (bottom-right, ~160px wide) never cover the bottom links row, at any screen width */
+.site-footer { padding-bottom: 90px !important; }
 
 @media (max-width: 480px) {
   .booking-inner  { padding: 32px 16px 48px !important; }

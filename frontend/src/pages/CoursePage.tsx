@@ -128,7 +128,7 @@ export default function CoursePage({ setPage }: { setPage: (p: string) => void }
         </motion.div>
 
         {/* ── Two-column layout ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 300px', gap: 24, alignItems: 'start' }}>
+        <div className="course-columns" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 300px', gap: 24, alignItems: 'start' }}>
 
           {/* LEFT column */}
           <div>
