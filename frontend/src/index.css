@@ -294,3 +294,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.1; }
   .contact-head  { padding: 40px 16px 28px !important; }
   .contact-body  { padding: 0 16px 48px !important; }
 }
+
+/* ── Arabic: one consistent font everywhere ──────────────────────
+   Headings across the site hardcode an inline Latin font (IBM Plex
+   Sans), which wins over the Cairo font applied at the root for
+   Arabic — so headings and body text visibly mismatch. Force Cairo
+   everywhere in Arabic instead of hunting down every inline override. */
+html[lang="ar"] * {
+  font-family: 'Cairo', 'Inter', sans-serif !important;
+}

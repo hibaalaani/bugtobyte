@@ -13,7 +13,7 @@ function InfoBlock({ label, children }: { label: string; children: React.ReactNo
 }
 
 function Section({ title, children, delay = 0 }: { title: string; children: React.ReactNode; delay?: number }) {
-  const ref    = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-40px 0px' })
   return (
     <motion.div
@@ -74,19 +74,15 @@ export default function ImpressumPage({ setPage }: { setPage: (p: string) => voi
             <dl>
               <div className="px-6">
                 <InfoBlock label="Business Name / Unternehmensname">
-                  [Business Name Placeholder]<br />
-                  <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>e.g. BugToByte Academy UG (haftungsbeschränkt)</span>
+                  Hiba Al-Aani<br />
+                  <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>trading as / handelnd unter „BugToByte Academy" (Einzelunternehmen / Kleingewerbe)</span>
                 </InfoBlock>
                 <InfoBlock label="Address / Anschrift">
-                  [Street &amp; House Number]<br />
-                  [Postal Code] [City]<br />
+                  13088 Berlin<br />
                   Germany / Deutschland
                 </InfoBlock>
                 <InfoBlock label="Direct Contact Phone / Direktkontakt Telefon">
-                  [+49 XXX XXXXXXX]<br />
-                  <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                    Hinweis: Eine Telefonnummer ist gemäß § 5 TMG Pflicht und muss eine direkte Erreichbarkeit ohne Mehrkosten gewährleisten.
-                  </span>
+                  +49 176 23168309
                 </InfoBlock>
                 <InfoBlock label="Email">
                   <a href="mailto:hello@bugtobyte.com" style={{ color: isDark ? '#FFD60A' : '#B45309' }} className="underline">
@@ -98,37 +94,9 @@ export default function ImpressumPage({ setPage }: { setPage: (p: string) => voi
           </div>
         </Section>
 
-        <Section title="Vertreten durch / Represented by" delay={0.08}>
-          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--border-color)' }}>
-            <dl>
-              <div className="px-6">
-                <InfoBlock label="Geschäftsführer / Managing Director">
-                  [Full Name of Managing Director]
-                </InfoBlock>
-              </div>
-            </dl>
-          </div>
-        </Section>
-
         <Section title="Registereintrag / Company Registration" delay={0.1}>
-          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--border-color)' }}>
-            <dl>
-              <div className="px-6">
-                <InfoBlock label="Registergericht / Register Court">
-                  [e.g. Amtsgericht Berlin-Charlottenburg]
-                </InfoBlock>
-                <InfoBlock label="Handelsregisternummer / Registration Number">
-                  [e.g. HRB XXXXXXX]
-                </InfoBlock>
-                <InfoBlock label="Umsatzsteuer-ID (§ 27a UStG) / VAT ID">
-                  [e.g. DE XXXXXXXXX]
-                </InfoBlock>
-              </div>
-            </dl>
-          </div>
-          <p className="text-[13px] mt-3 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-            Wenn kein Handelsregistereintrag besteht (z. B. Kleingewerbe), entfällt diese Angabe.
-            Umsatzsteuer-ID ist nur erforderlich, wenn steuerpflichtige Umsätze vorliegen.
+          <p className="text-[15px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            Kein Handelsregistereintrag (Kleingewerbe). Keine Umsatzsteuer-ID — Kleinunternehmerregelung, keine steuerpflichtigen Umsätze.
           </p>
         </Section>
 
@@ -136,8 +104,8 @@ export default function ImpressumPage({ setPage }: { setPage: (p: string) => voi
           <div className="rounded-2xl p-5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
             <p className="text-[15px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:<br />
-              <strong style={{ color: 'var(--text-primary)' }}>[Full Name]</strong><br />
-              [Street &amp; Number], [Postal Code] [City], Germany
+              <strong style={{ color: 'var(--text-primary)' }}>Hiba Al-Aani</strong><br />
+              13088 Berlin, Germany
             </p>
           </div>
         </Section>
@@ -184,20 +152,6 @@ export default function ImpressumPage({ setPage }: { setPage: (p: string) => voi
             </div>
           </div>
         </Section>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="rounded-2xl p-5 text-[13px] leading-relaxed"
-          style={{ background: isDark ? 'rgba(255,214,10,0.05)' : 'rgba(180,83,9,0.05)', border: isDark ? '1px solid rgba(255,214,10,0.15)' : '1px solid rgba(180,83,9,0.15)', color: 'var(--text-muted)' }}
-        >
-          <strong style={{ color: isDark ? '#FFD60A' : '#B45309' }}>Note for operator:</strong>{' '}
-          Replace all placeholders in square brackets [&nbsp;] with your actual business details before going
-          live. A German Impressum with a missing phone number or incorrect company data can result in costly
-          cease-and-desist letters (Abmahnungen).
-        </motion.div>
 
       </div>
     </div>
