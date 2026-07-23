@@ -113,6 +113,15 @@ CREATE TABLE public.chat_messages (
 
 CREATE INDEX idx_chat_messages_conversation ON public.chat_messages(channel, conversation_key, created_at);
 
+-- ── CONVERSATION TAKEOVERS (admin pauses the bot to reply manually) ──
+CREATE TABLE public.conversation_takeovers (
+  channel          TEXT NOT NULL,
+  conversation_key TEXT NOT NULL,
+  is_paused        BOOLEAN NOT NULL DEFAULT FALSE,
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (channel, conversation_key)
+);
+
 -- ================================================================
 --  ROW LEVEL SECURITY (RLS)
 -- ================================================================
@@ -125,12 +134,23 @@ ALTER TABLE public.contact_messages  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.testimonials      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_messages     ENABLE ROW LEVEL SECURITY;
 -- No public policies on chat_messages — only the backend's service-role key reads/writes chat history.
+ALTER TABLE public.conversation_takeovers ENABLE ROW LEVEL SECURITY;
+-- No public policies on conversation_takeovers — only the backend's service-role key reads/writes it.
 
 -- Profiles
 CREATE POLICY "Users can read own profile"   ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
-CREATE POLICY "Admins can read all profiles" ON public.profiles FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+-- SECURITY DEFINER avoids the self-referencing RLS recursion a naive
+-- EXISTS-subquery-on-profiles policy triggers (this bit the project once already).
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql SECURITY DEFINER STABLE
+AS $$
+  SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin');
+$$;
+
+CREATE POLICY "Admins can read all profiles" ON public.profiles FOR SELECT USING (public.is_admin());
 
 -- Kids
 CREATE POLICY "Parents manage own kids" ON public.kids FOR ALL USING (auth.uid() = parent_id);

@@ -17,6 +17,7 @@ import bookingsRouter    from './routes/bookings'
 import contactRouter     from './routes/contact'
 import whatsappRouter    from './routes/whatsapp'
 import chatRouter        from './routes/chat'
+import adminRouter       from './routes/admin'
 import { requireAuth }   from './middleware/auth'
 
 dotenv.config()
@@ -72,6 +73,7 @@ app.use('/api/bookings', bookingsRouter)
 app.use('/api/contact',  contactRouter)
 app.use('/api/whatsapp', whatsappRouter)
 app.use('/api/chat',     chatRouter)
+app.use('/api/admin',    adminRouter)
 
 // ── Stripe checkout session (auth required) ───────────────────
 app.post('/api/stripe/create-checkout', requireAuth, async (req, res) => {

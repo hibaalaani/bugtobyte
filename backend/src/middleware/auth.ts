@@ -32,3 +32,18 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   req.userId = user.id
   next()
 }
+
+/**
+ * Requires requireAuth to have run first (needs req.userId).
+ * Rejects unless the authenticated user's profile has role = 'admin'.
+ */
+export async function requireAdminRole(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', req.userId).single()
+
+  if (profile?.role !== 'admin') {
+    res.status(403).json({ error: 'Forbidden' })
+    return
+  }
+
+  next()
+}

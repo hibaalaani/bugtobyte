@@ -3,12 +3,13 @@ import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { format } from 'date-fns'
-import { CheckCircle, XCircle, Trash2, RefreshCw, Mail, Calendar, Users, MessageSquare, ChevronDown } from 'lucide-react'
+import { CheckCircle, XCircle, Trash2, RefreshCw, Mail, Calendar, Users, MessageSquare, ChevronDown, Phone, Send, Play } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const ADMIN_EMAIL = 'hiba.a.alaani@gmail.com'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
-type Tab = 'appointments' | 'students' | 'messages'
+type Tab = 'appointments' | 'students' | 'messages' | 'whatsapp'
 type StatusFilter = 'all' | 'confirmed' | 'completed' | 'cancelled' | 'pending'
 
 interface AdminAppointment {
@@ -44,6 +45,20 @@ interface Student {
   last_booking: string
 }
 
+interface Conversation {
+  conversation_key: string
+  last_message: string
+  last_role: string
+  last_at: string
+  is_paused: boolean
+}
+
+interface ConvoMessage {
+  role: 'user' | 'assistant'
+  content: string
+  created_at: string
+}
+
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   confirmed:  { bg: 'rgba(0,255,135,.12)',  color: '#00FF87' },
   completed:  { bg: 'rgba(96,165,250,.12)', color: '#60A5FA' },
@@ -52,7 +67,7 @@ const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
 }
 
 export default function AdminPage({ setPage }: { setPage: (p: string) => void }) {
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   const [tab, setTab]           = useState<Tab>('appointments')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [appointments, setAppointments] = useState<AdminAppointment[]>([])
@@ -60,6 +75,13 @@ export default function AdminPage({ setPage }: { setPage: (p: string) => void })
   const [students, setStudents]         = useState<Student[]>([])
   const [loading, setLoading]           = useState(true)
   const [expandedId, setExpandedId]     = useState<string | null>(null)
+
+  // ── WhatsApp inbox ──
+  const [conversations, setConversations]   = useState<Conversation[]>([])
+  const [selectedKey, setSelectedKey]       = useState<string | null>(null)
+  const [convoMessages, setConvoMessages]   = useState<ConvoMessage[]>([])
+  const [replyText, setReplyText]           = useState('')
+  const [sending, setSending]               = useState(false)
 
   // ── Data fetching ─────────────────────────────────────────────
   const fetchAppointments = useCallback(async () => {
@@ -111,11 +133,36 @@ export default function AdminPage({ setPage }: { setPage: (p: string) => void })
     setLoading(false)
   }, [])
 
+  const fetchConversations = useCallback(async () => {
+    if (!session) return
+    setLoading(true)
+    const res = await fetch(`${API}/api/admin/conversations`, {
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+    })
+    const data = await res.json().catch(() => ({}))
+    setConversations(res.ok ? (data.conversations ?? []) : [])
+    setLoading(false)
+  }, [session])
+
+  const fetchConvoMessages = useCallback(async (key: string) => {
+    if (!session) return
+    const res = await fetch(`${API}/api/admin/conversations/${encodeURIComponent(key)}/messages`, {
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+    })
+    const data = await res.json().catch(() => ({}))
+    setConvoMessages(res.ok ? (data.messages ?? []) : [])
+  }, [session])
+
   useEffect(() => {
     if (tab === 'appointments') fetchAppointments()
     else if (tab === 'messages')     fetchMessages()
     else if (tab === 'students')     fetchStudents()
+    else if (tab === 'whatsapp')     fetchConversations()
   }, [tab])
+
+  useEffect(() => {
+    if (selectedKey) fetchConvoMessages(selectedKey)
+  }, [selectedKey])
 
   // ── Actions ───────────────────────────────────────────────────
   const updateStatus = async (id: string, status: string) => {
@@ -143,6 +190,31 @@ export default function AdminPage({ setPage }: { setPage: (p: string) => void })
     await supabase.from('contact_messages').delete().eq('id', id)
     setMessages(prev => prev.filter(m => m.id !== id))
     toast.success('Deleted')
+  }
+
+  const sendManualReply = async () => {
+    if (!session || !selectedKey || !replyText.trim() || sending) return
+    setSending(true)
+    const res = await fetch(`${API}/api/admin/conversations/${encodeURIComponent(selectedKey)}/reply`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body:    JSON.stringify({ message: replyText.trim() }),
+    })
+    if (!res.ok) { toast.error('Failed to send'); setSending(false); return }
+    setReplyText('')
+    setSending(false)
+    await fetchConvoMessages(selectedKey)
+    await fetchConversations()
+  }
+
+  const resumeBot = async (key: string) => {
+    if (!session) return
+    await fetch(`${API}/api/admin/conversations/${encodeURIComponent(key)}/resume`, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${session.access_token}` },
+    })
+    toast.success('Bot resumed for this conversation')
+    fetchConversations()
   }
 
   // ── Guard ─────────────────────────────────────────────────────
@@ -202,6 +274,7 @@ export default function AdminPage({ setPage }: { setPage: (p: string) => void })
             { key: 'appointments', label: 'Appointments', icon: Calendar, count: appointments.length },
             { key: 'students',     label: 'Students',     icon: Users,    count: students.length },
             { key: 'messages',     label: 'Messages',     icon: MessageSquare, count: messages.length },
+            { key: 'whatsapp',     label: 'WhatsApp',     icon: Phone,    count: conversations.length },
           ] as const).map(({ key, label, icon: Icon, count }) => (
             <button key={key} onClick={() => setTab(key)}
               style={{
@@ -430,6 +503,97 @@ export default function AdminPage({ setPage }: { setPage: (p: string) => void })
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ── WHATSAPP TAB ── */}
+        {tab === 'whatsapp' && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .3 }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+              <button onClick={fetchConversations} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, color: 'rgba(240,239,231,.5)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <RefreshCw size={12} /> Refresh
+              </button>
+            </div>
+
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: 60, color: 'rgba(240,239,231,.3)' }}>Loading...</div>
+            ) : conversations.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 60, color: 'rgba(240,239,231,.3)' }}>No WhatsApp conversations yet</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, alignItems: 'start' }}>
+
+                {/* Conversation list */}
+                <div style={{ background: 'rgba(255,255,255,.02)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, overflow: 'hidden' }}>
+                  {conversations.map(c => (
+                    <div key={c.conversation_key} onClick={() => setSelectedKey(c.conversation_key)}
+                      style={{
+                        padding: '14px 16px', cursor: 'pointer',
+                        background: selectedKey === c.conversation_key ? 'rgba(0,255,135,.06)' : 'transparent',
+                        borderBottom: '1px solid rgba(255,255,255,.05)',
+                      }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                        <span style={{ fontWeight: 700, fontSize: 14 }}>+{c.conversation_key}</span>
+                        {c.is_paused && (
+                          <span style={{ background: 'rgba(251,191,36,.12)', color: '#FBBF24', borderRadius: 6, padding: '2px 8px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>Paused</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 12, color: 'rgba(240,239,231,.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {c.last_role === 'user' ? '' : '↳ '}{c.last_message}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(240,239,231,.3)', marginTop: 4 }}>
+                        {c.last_at ? format(new Date(c.last_at), 'MMM d, HH:mm') : ''}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Selected conversation thread */}
+                <div style={{ background: 'rgba(255,255,255,.02)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, display: 'flex', flexDirection: 'column', height: 560 }}>
+                  {!selectedKey ? (
+                    <div style={{ margin: 'auto', color: 'rgba(240,239,231,.3)', fontSize: 14 }}>Select a conversation</div>
+                  ) : (
+                    <>
+                      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 700 }}>+{selectedKey}</span>
+                        {conversations.find(c => c.conversation_key === selectedKey)?.is_paused && (
+                          <button onClick={() => resumeBot(selectedKey)} style={{ background: 'rgba(96,165,250,.1)', border: '1px solid rgba(96,165,250,.2)', borderRadius: 6, padding: '5px 12px', cursor: 'pointer', color: '#60A5FA', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontFamily: 'inherit', fontWeight: 600 }}>
+                            <Play size={13} /> Resume bot
+                          </button>
+                        )}
+                      </div>
+
+                      <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {convoMessages.map((m, i) => (
+                          <div key={i} style={{
+                            alignSelf: m.role === 'user' ? 'flex-start' : 'flex-end',
+                            maxWidth: '75%',
+                            background: m.role === 'user' ? 'rgba(255,255,255,.05)' : 'rgba(0,255,135,.1)',
+                            border: `1px solid ${m.role === 'user' ? 'rgba(255,255,255,.08)' : 'rgba(0,255,135,.2)'}`,
+                            borderRadius: 10, padding: '9px 14px', fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-wrap',
+                          }}>
+                            {m.content}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ display: 'flex', gap: 8, padding: 16, borderTop: '1px solid rgba(255,255,255,.07)' }}>
+                        <input
+                          value={replyText}
+                          onChange={e => setReplyText(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') sendManualReply() }}
+                          placeholder="Type a reply — sending will pause the bot for this chat"
+                          style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '10px 14px', color: '#F0EFE7', fontFamily: 'inherit', fontSize: 13, outline: 'none' }}
+                        />
+                        <button onClick={sendManualReply} disabled={sending || !replyText.trim()}
+                          style={{ background: 'rgba(0,255,135,.1)', border: '1px solid rgba(0,255,135,.2)', borderRadius: 8, padding: '10px 16px', cursor: sending ? 'default' : 'pointer', opacity: sending || !replyText.trim() ? 0.5 : 1, color: '#00FF87', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600 }}>
+                          <Send size={14} />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </motion.div>

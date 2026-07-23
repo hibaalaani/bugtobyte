@@ -4,7 +4,11 @@ import { notifyTeam } from './notify'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-type Channel = 'web' | 'whatsapp'
+export type Channel = 'web' | 'whatsapp'
+
+export async function saveMessage(channel: Channel, conversationKey: string, role: 'user' | 'assistant', content: string): Promise<void> {
+  await supabaseAdmin.from('chat_messages').insert({ channel, conversation_key: conversationKey, role, content })
+}
 
 function buildSystemPrompt(channel: Channel): string {
   const contactInstruction = channel === 'web'

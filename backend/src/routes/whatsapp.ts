@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
-import { getBotReply } from '../lib/chatbot'
+import { getBotReply, saveMessage } from '../lib/chatbot'
 import { sendWhatsAppMessage } from '../lib/whatsapp'
+import { isConversationPaused } from '../lib/takeover'
 
 const router = Router()
 
@@ -28,10 +29,17 @@ router.post('/', async (req: Request, res: Response) => {
     const message = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]
     if (!message || message.type !== 'text') return
 
-    const from  = message.from as string // sender's phone number — doubles as the conversation key
-    const text  = message.text?.body as string
-    const reply = await getBotReply('whatsapp', from, text)
+    const from = message.from as string // sender's phone number — doubles as the conversation key
+    const text = message.text?.body as string
 
+    // An admin has taken over this conversation manually — log the message
+    // for the inbox to show, but don't let the bot jump in and reply too.
+    if (await isConversationPaused(from)) {
+      await saveMessage('whatsapp', from, 'user', text)
+      return
+    }
+
+    const reply = await getBotReply('whatsapp', from, text)
     await sendWhatsAppMessage(from, reply)
   } catch (err: any) {
     console.error('[whatsapp webhook] error:', err.message)
